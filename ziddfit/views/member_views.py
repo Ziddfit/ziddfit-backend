@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.response import Response
 from ..models import GymMember, Gym
-from ..serializers import MemberSerializer
+from ..serializers.member_serializer import GymMemberSerializer
 
 
 #this is the gym member CREATE and READ function
@@ -11,7 +11,7 @@ def member_list(request):
     if request.method == 'GET':
         try:
             members = GymMember.objects.filter( Gym__owner = request.user)
-            serializer = MemberSerializer(members, many=True)
+            serializer = GymMemberSerializer(members, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response(
@@ -21,7 +21,7 @@ def member_list(request):
         
     elif request.method == 'POST':
         try:
-            serializer = MemberSerializer(data=request.data)
+            serializer = GymMemberSerializer(data=request.data)
             if serializer.is_valid:
                 gym = serializer.validated_data.get('gym')
                 if gym.owner != request.user:
