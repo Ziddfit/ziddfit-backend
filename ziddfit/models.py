@@ -14,10 +14,6 @@ class Subscription(models.Model):
     start_date = models.DateTimeField(auto_now_add=True)
     expiry_date = models.DateTimeField(null=True, blank=True)
 
-class Gym(models.Model):
-    id = models.UUIDField(primary_key=True, default = uuid.uuid4, editable= False)
-    name = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add= True)
 
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default = uuid.uuid4, editable = False)
@@ -33,3 +29,12 @@ class User(AbstractUser):
     phone_number = models.CharField(max_length=15, blank=True)
     email_id = models.EmailField(max_length=254)
 
+
+class Gym(models.Model):
+    id = models.UUIDField(primary_key=True, default = uuid.uuid4, editable= False)
+    owner = models.ForeignKey(User, 
+        on_delete= models.CASCADE,
+        related_name= 'gyms'
+    )
+    name = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add= True)
