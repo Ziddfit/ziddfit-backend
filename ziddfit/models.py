@@ -25,16 +25,19 @@ class User(AbstractUser):
         blank=True,
         related_name='owner'
     )
-    business_name = models.CharField(max_length=255, blank=True)
     phone_number = models.CharField(max_length=15, blank=True)
     email_id = models.EmailField(max_length=254)
 
 
 class Gym(models.Model):
     id = models.UUIDField(primary_key=True, default = uuid.uuid4, editable= False)
-    owner = models.ForeignKey(User, 
+    owner = models.ForeignKey(
+        User, 
         on_delete= models.CASCADE,
         related_name= 'gyms'
     )
     name = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add= True)
+
+class Member(AbstractUser):
+    id = models.UUIDField(primary_key= True, default = uuid.uuid4, editable= False)
