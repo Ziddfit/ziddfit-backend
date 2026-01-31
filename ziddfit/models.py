@@ -41,3 +41,14 @@ class Gym(models.Model):
 
 class Member(AbstractUser):
     id = models.UUIDField(primary_key= True, default = uuid.uuid4, editable= False)
+    gym = models.ForeignKey(
+        Gym, 
+        on_delete=models.CASCADE, 
+        related_name='members'
+    )
+    first_name = models.CharField(max_length= 100)
+    last_name = models.CharField(max_length=100)
+    email = models.EmailField( null= True)
+    phone = models.CharField(max_length=20)
+    membership_start = models.DateField(auto_now_add=True)
+    membership_end = models.DateField()
