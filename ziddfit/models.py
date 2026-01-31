@@ -11,7 +11,7 @@ class Plan(models.Model):
         ('enterprise', 'Enterprise'),
     ]
     plan_name = models.CharField(max_length=20, choices=PLAN_CHOICES, default='free')
-    is_active = models.BooleanField(default = False)
+    is_active = models.BooleanField(default = True)
     start_date = models.DateTimeField(auto_now_add=True)
     expiry_date = models.DateTimeField(null=True, blank=True)
 
@@ -80,6 +80,8 @@ class GymAttendence(models.Model):
 
 class GymSubscription(models.Model):
     id = models.UUIDField(primary_key= True, default = uuid.uuid4, editable= False)
+    Time_period = models.PositiveIntegerField(help_text="Duration of the plan in days")
+    Description = models.CharField(max_length = 250)
     member = models.OneToOneField(
         GymMember,
         on_delete=models.SET_NULL,
@@ -87,3 +89,5 @@ class GymSubscription(models.Model):
         blank=True,
         related_name='subscription'
     )
+    discount = models.PositiveIntegerField(help_text = "current available discount")
+    is_Active = models.BooleanField(default = True)
