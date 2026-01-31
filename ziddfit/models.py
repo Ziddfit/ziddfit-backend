@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
+from django.contrib.postgres.indexes import GinIndex
 import uuid
 
 class Subscription(models.Model):
@@ -39,6 +40,7 @@ class Gym(models.Model):
     name = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add= True)
 
+
 class Member(AbstractUser):
     id = models.UUIDField(primary_key= True, default = uuid.uuid4, editable= False)
     gym = models.ForeignKey(
@@ -52,3 +54,25 @@ class Member(AbstractUser):
     phone = models.CharField(max_length=20)
     membership_start = models.DateField(auto_now_add=True)
     membership_end = models.DateField()
+
+
+    extra_info = models.JSONField(default=dict, blank=True)
+    class Meta:
+        indexes = [
+            GinIndex(fields=['extra_info']),
+        ]
+
+
+class Attendence:
+    gym = models.ForeignKey(
+        Gym, 
+        on_delete= models.CASCADE,
+        related_name = "gymattends"
+    )
+    user = models.ForeignKey(
+        Member,
+        on_delete = models.CASCADE,
+        related_name= "memattends"
+    )
+    checkin_Time = models.DateTimeField(auto_now_add= True)
+    entry_source = models.CharField(max_length=50, default='QR_SCAN')
