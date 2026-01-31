@@ -18,5 +18,6 @@ from django.contrib import admin
 from django.urls import include, path
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('hacks/', include("ziddfit.urls"))
+    path('hacks/', include("ziddfit.urls")),
+    path('api/', include('ziddfit.routes'))
 ]
