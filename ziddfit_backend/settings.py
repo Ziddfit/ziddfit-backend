@@ -74,8 +74,12 @@ WSGI_APPLICATION = 'ziddfit_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'your_db_name',       # The name of the DB you created in Postgres
+        'USER': 'your_db_user',       # Your Postgres username
+        'PASSWORD': 'your_password',  # Your Postgres password
+        'HOST': 'localhost',          # Set to IP address if the DB is remote
+        'PORT': '5432',               # Default Postgres port
     }
 }
 
