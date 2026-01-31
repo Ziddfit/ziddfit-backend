@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 from django.contrib.postgres.indexes import GinIndex
 import uuid
 
-class Subscription(models.Model):
+class Plan(models.Model):
     PLAN_CHOICES = [
         ('free', 'Free Tier'),
         ('pro', 'Professional'),
@@ -20,7 +20,7 @@ class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default = uuid.uuid4, editable = False)
     business_name = models.charField(max_length = 255)
     subscription = models.OneToOneField(
-        Subscription, 
+        Plan, 
         on_delete=models.SET_NULL, 
         null=True, 
         blank=True,
@@ -41,7 +41,7 @@ class Gym(models.Model):
     created_at = models.DateTimeField(auto_now_add= True)
 
 
-class Member(AbstractUser):
+class GymMember(AbstractUser):
     id = models.UUIDField(primary_key= True, default = uuid.uuid4, editable= False)
     gym = models.ForeignKey(
         Gym, 
@@ -63,16 +63,27 @@ class Member(AbstractUser):
         ]
 
 
-class Attendence:
+class GymAttendence(models.Model):
     gym = models.ForeignKey(
         Gym, 
         on_delete= models.CASCADE,
-        related_name = "gymattends"
+        related_name = 'gymattends'
     )
     user = models.ForeignKey(
-        Member,
+        GymMember,
         on_delete = models.CASCADE,
-        related_name= "memattends"
+        related_name= 'memattends'
     )
     checkin_Time = models.DateTimeField(auto_now_add= True)
     entry_source = models.CharField(max_length=50, default='QR_SCAN')
+
+
+class GymSubscription(models.Model):
+    id = models.UUIDField(primary_key= True, default = uuid.uuid4, editable= False)
+    member = models.OneToOneField(
+        GymMember,
+        on_delete=models.SET_NULL,
+        null=True, 
+        blank=True,
+        related_name='subscription'
+    )
