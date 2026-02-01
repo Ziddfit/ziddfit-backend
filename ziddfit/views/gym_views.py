@@ -35,8 +35,8 @@ def gym_list(request):
 
 
 @api_view(['PUT', 'UPDATE', 'DELETE'])
-def gym_detail(request, pk):
-    gym = get_object_or_404(Gym, pk=pk, owner=request.user)
+def gym_detail(request, gym_id):
+    gym = get_object_or_404(Gym, pk=gym_id, owner=request.user)
     if request.method == 'GET':
         serializer = GymSerializer(gym)
         return Response(serializer.data)
