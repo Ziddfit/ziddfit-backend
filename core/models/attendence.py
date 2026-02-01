@@ -1,7 +1,5 @@
 from django.db import models
-from django.conf import settings
 from django.contrib.postgres.indexes import GinIndex
-import uuid
 from core.models.gym import Gym
 from core.models.members import GymMember
 
