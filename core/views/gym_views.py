@@ -2,9 +2,8 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from ..models import GymMember, Gym
-from ..serializers.gym_serializer import GymSerializer
-
+from core.models.gym  import Gym
+from core.serializers.gym_serializer import GymSerializer
 
 @api_view(['GET', 'POST'])
 def gym_list(request):
@@ -21,7 +20,7 @@ def gym_list(request):
     elif request.method == 'POST':
         try:
             serializer = GymSerializer(data = request.data)
-            if serializer.is_valid:
+            if serializer.is_valid():
                 serializer.save(owner=request.user)
                 return Response( serializer.data, status = status.HTTP_201_CREATED)
                 

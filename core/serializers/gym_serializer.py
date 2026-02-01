@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from ..models import Gym
+from core.models.gym import Gym
 
 class GymSerializer(serializers.ModelSerializer):
     class Meta:

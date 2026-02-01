@@ -2,8 +2,9 @@ from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
-from ..models import GymMember, Gym
-from ..serializers.member_serializer import GymMemberSerializer
+from core.models.gym import Gym
+from core.models.members import GymMember
+from core.serializers.member_serializer import GymMemberSerializer
 
 
 #this is the gym member CREATE and READ function
@@ -11,7 +12,7 @@ from ..serializers.member_serializer import GymMemberSerializer
 def member_list(request):
     if request.method == 'GET':
         try:
-            members = GymMember.objects.filter( Gym__owner = request.user)
+            members = GymMember.objects.filter(gym__owner=request.user)
             serializer = GymMemberSerializer(members, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
@@ -23,7 +24,7 @@ def member_list(request):
     elif request.method == 'POST':
         try:
             serializer = GymMemberSerializer(data=request.data)
-            if serializer.is_valid:
+            if serializer.is_valid():
                 gym = serializer.validated_data.get('gym')
                 if gym.owner != request.user:
                     return Response(
