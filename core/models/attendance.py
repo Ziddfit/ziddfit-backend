@@ -3,7 +3,7 @@ from django.contrib.postgres.indexes import GinIndex
 from core.models.gym import Gym
 from core.models.members import GymMember
 
-class GymAttendence(models.Model):
+class GymAttendance(models.Model):
     gym = models.ForeignKey(
         Gym, 
         on_delete= models.CASCADE,
@@ -16,3 +16,4 @@ class GymAttendence(models.Model):
     )
     checkin_Time = models.DateTimeField(auto_now_add= True)
     entry_source = models.CharField(max_length=50, default='QR_SCAN')
+    
