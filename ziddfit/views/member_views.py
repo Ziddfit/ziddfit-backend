@@ -44,6 +44,3 @@ def member_list(request):
             )
         
 
-@api_view(['PATCH', 'UPDATE', 'DELETE'])
-def gym_detail(request, pk):
-    pass

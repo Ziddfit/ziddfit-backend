@@ -40,3 +40,14 @@ def gym_detail(request, pk):
     if request.method == 'GET':
         serializer = GymSerializer(gym)
         return Response(serializer.data)
+    
+    if request.method == 'PUT':
+        serializer = GymSerializer(gym, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    if request.method == 'DELETE':
+        gym.delete()
+        return Response({"message": "Gym deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
