@@ -1,5 +1,6 @@
 from rest_framework.decorators import api_view
 from rest_framework import status
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from ..models import GymMember, Gym
 from ..serializers.gym_serializer import GymSerializer
@@ -31,3 +32,11 @@ def gym_list(request):
                 {"error": "Creation failed", "details": str(e)},
                 status = status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+
+@api_view(['PATCH', 'UPDATE', 'DELETE'])
+def gym_detail(request, pk):
+    gym = get_object_or_404(Gym, pk=pk, owner=request.user)
+    if request.method == 'GET':
+        serializer = GymSerializer(gym)
+        return Response(serializer.data)
