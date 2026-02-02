@@ -7,7 +7,10 @@ import uuid
 
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default = uuid.uuid4, editable = False)
-    business_name = models.CharField(max_length = 255, blank=True)
+    business_name = models.CharField(
+        max_length = 255,
+        blank = True
+        )
     subscription = models.ForeignKey(
         'Plan.Plan', 
         on_delete=models.SET_NULL, 
@@ -15,5 +18,14 @@ class User(AbstractUser):
         blank=True,
         related_name='users'
     )
-    phone_number = models.CharField(max_length=15, blank=True)
-    email_id = models.EmailField(max_length=254,unique=True)
+    phone_number = models.CharField(
+        max_length=15,
+        unique=True,
+        blank=True
+    )
+    email = models.EmailField(
+        unique=True
+    )
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
