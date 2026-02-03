@@ -68,9 +68,12 @@ def attendance_list(request, gym_id):
         entry_source = request.query_params.get('entry_source')
         if entry_source:
             attendances = attendances.filter(entry_source=entry_source)
+        
+        paginator = StandardResultsPagination()
+        paginated_qs = paginator.paginate_queryset(attendances, request)
 
-        serializer = GymAttendanceSerializer(attendances, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = GymAttendanceSerializer(paginated_qs, many=True)
+        return paginator.get_paginated_response(serializer.data)
     
     if request.method == 'POST':
         serializer = GymAttendanceSerializer(data=request.data)
