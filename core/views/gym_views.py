@@ -33,7 +33,7 @@ def gym_list(request):
             )
 
 
-@api_view(['PUT', 'UPDATE', 'DELETE'])
+@api_view(['PUT', 'PUT', 'DELETE'])
 def gym_detail(request, gym_id):
     gym = get_object_or_404(Gym, pk=gym_id, owner=request.user)
     if request.method == 'GET':
