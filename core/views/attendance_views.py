@@ -97,7 +97,7 @@ def attendance_checkin(request):
     if GymAttendance.objects.filter(
         gym=gym,
         user=member,
-        checkin_Time__date=today
+        checkin_time__date=today
     ).exists():
         return Response(
             {'error': 'Member already checked in today'},
@@ -138,11 +138,11 @@ def attendance_stats(request, gym_id):
 
     queryset = GymAttendance.objects.filter(
         gym=gym,
-        checkin_Time__gte=date_from
+        checkin_time__gte=date_from
     )
 
     daily_breakdown = queryset.annotate(
-        day=TruncDate('checkin_Time')
+        day=TruncDate('checkin_time')
     ).values('day').annotate(
         checkins=Count('id')
     ).order_by('-day')

@@ -14,6 +14,6 @@ class GymAttendance(models.Model):
         on_delete = models.CASCADE,
         related_name= 'memattends'
     )
-    checkin_Time = models.DateTimeField(auto_now_add= True)
+    checkin_time = models.DateTimeField(auto_now_add= True)
     entry_source = models.CharField(max_length=50, default='QR_SCAN')
     
