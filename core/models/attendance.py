@@ -26,5 +26,5 @@ class GymAttendance(models.Model):
             )
         ]
     indexes = [
-            models.Index(fields=['gym', 'member', 'checkin_date']),  # ✅ Fast lookup
+            models.Index(fields=['gym', 'member', 'checkin_date']), 
         ]
