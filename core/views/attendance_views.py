@@ -26,11 +26,44 @@ def attendance_list(request, gym_id):
 
         date_from = request.query_params.get('date_from')
         if date_from:
-            attendances = attendances.filter(date__gte=date_from)
-
+            try:
+                date_from_obj = datetime.strptime(date_from, '%Y-%m-%d')
+                attendances = attendances.filter(date__gte=date_from)
+            except ValueError:
+                    return Response(
+                        {
+                            'error': 'Invalid date_from format',
+                            'detail': 'Expected format: YYYY-MM-DD (e.g., 2025-02-01)',
+                            'received': date_from
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
+                    ) 
+            
         date_to = request.query_params.get('date_to')
         if date_to:
-            attendances = attendances.filter(date__lte=date_to)
+            try:
+                date_to_obj = datetime.strptime(date_to, '%Y-%m-%d')
+                date_to_obj = date_to_obj.replace(hour = 23, minute = 59, second = 59)
+                attendances = attendances.filter(date__lte=date_to)
+
+            except ValueError:
+                return Response(
+                    {
+                        'error': 'Invalid date_to format',
+                        'detail': 'Expected format: YYYY-MM-DD (e.g., 2025-02-01)',
+                        'received': date_to
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        if date_from and date_to:
+            if date_from_obj > date_to_obj:
+                return Response(
+                    {
+                        'error': 'Invalid date range',
+                        'detail': 'date_from must be before or equal to date_to'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
         entry_source = request.query_params.get('entry_source')
         if entry_source:
@@ -47,7 +80,7 @@ def attendance_list(request, gym_id):
             member_id = serializer.data.get('member_id')
             member = get_object_or_404(GymMember, pk=member_id, gym=gym)
             serializer.save(gym=gym, member = member)
-            
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
