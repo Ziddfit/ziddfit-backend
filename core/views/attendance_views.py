@@ -38,12 +38,17 @@ def attendance_list(request, gym_id):
 
         serializer = GymAttendanceSerializer(attendances, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    if request.method == 'POST':
+        serializer = GymAttendanceSerializer(data=request.data)
+        if serializer.is_valid():
+            gym = get_object_or_404(Gym, id=gym_id, owner=request.user)
 
-    serializer = GymAttendanceSerializer(data=request.data)
-    if serializer.is_valid():
-        gym = get_object_or_404(Gym, id=gym_id, owner=request.user)
-        serializer.save(gym=gym)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+            member_id = serializer.data.get('member_id')
+            member = get_object_or_404(GymMember, pk=member_id, gym=gym)
+            serializer.save(gym=gym, member = member)
+            
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
