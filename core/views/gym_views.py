@@ -1,4 +1,4 @@
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework import status
 from django.shortcuts import get_object_or_404
@@ -7,6 +7,7 @@ from core.models.gym  import Gym
 from core.serializers.gym_serializer import GymSerializer
 
 @api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
 def gym_list(request):
     if request.method == 'GET':
         try:
@@ -34,7 +35,8 @@ def gym_list(request):
             )
 
 
-@api_view(['PUT', 'PUT', 'DELETE'])
+@api_view(['PUT', 'PATCH', 'DELETE'])
+@permission_classes([IsAuthenticated])
 def gym_detail(request, gym_id):
     gym = get_object_or_404(Gym, pk=gym_id, owner=request.user)
     if request.method == 'GET':
