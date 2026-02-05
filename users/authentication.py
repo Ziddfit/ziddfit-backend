@@ -108,6 +108,8 @@ class SupabaseAuthentication(BaseAuthentication):
             user = User.objects.create(
                 id=supabase_uid,
                 email=email,
+                first_name = f_name,
+                last_name = l_name,
                 username=email,
                 is_active=True,
                 phone_number=None 

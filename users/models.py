@@ -11,6 +11,8 @@ class User(AbstractUser):
     last_name = models.charField(max_length = 255, blank = True)
 
     business_name = models.CharField(max_length=255, blank=True)
+
+    profile_pic = models.charField(max_length = 1000, blank = True)
     
     subscription = models.ForeignKey(
         'Plan.Plan', 
