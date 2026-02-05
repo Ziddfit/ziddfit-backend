@@ -7,12 +7,12 @@ import uuid
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=True) 
     
-    first_name = models.charField(max_length = 255, blank = True)
-    last_name = models.charField(max_length = 255, blank = True)
+    first_name = models.CharField(max_length = 255, blank = True)
+    last_name = models.CharField(max_length = 255, blank = True)
 
     business_name = models.CharField(max_length=255, blank=True)
 
-    profile_pic = models.charField(max_length = 1000, blank = True)
+    profile_pic = models.CharField(max_length = 1000, blank = True)
     
     subscription = models.ForeignKey(
         'Plan.Plan', 

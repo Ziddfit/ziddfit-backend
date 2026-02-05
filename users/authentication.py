@@ -69,7 +69,8 @@ class SupabaseAuthentication(BaseAuthentication):
             )
         except Exception as e:
             raise Exception(f"Signature check failed: {str(e)}")
-        
+
+
     def get_or_create_user(self, payload):
         supabase_uid = payload.get('sub')
         email = payload.get('email')
@@ -77,8 +78,7 @@ class SupabaseAuthentication(BaseAuthentication):
         metadata = payload.get('user_metadata', {})
         full_name = metadata.get('full_name', '')
         avatar_url = metadata.get('avatar_url', '')
-
-        
+     
         if not supabase_uid:
             raise AuthenticationFailed('Invalid payload: missing sub')
 
@@ -89,23 +89,22 @@ class SupabaseAuthentication(BaseAuthentication):
         user = User.objects.filter(email=email).first()
         if user:
             user.id = supabase_uid
+            if not user.profile_pic:
+                user.profile_pic = avatar_url
             user.save()
             return (user, None)
 
         try:
-            profile_pic = avatar_url
-            name = full_name.split(' ', 1)
-            if len(name) > 1:
-                f_name = name[0] if len(name) > 0 else ""
-                l_name = name[1] if len(name) > 1 else ""
-
+            name_parts = full_name.split(' ', 1)
+            f_name = name_parts[0] if len(name_parts) > 0 else ""
+            l_name = name_parts[1] if len(name_parts) > 1 else ""
 
             user = User.objects.create(
                 id=supabase_uid,
                 email=email,
-                first_name = f_name,
-                last_name = l_name,
-                profile_pic = profile_pic, 
+                first_name=f_name,
+                last_name=l_name,
+                profile_pic=avatar_url, 
                 username=email,
                 is_active=True,
                 phone_number=None 
