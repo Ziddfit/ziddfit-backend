@@ -14,24 +14,19 @@ class SupabaseAuthentication(BaseAuthentication):
         auth_header = request.headers.get('Authorization')
         if not auth_header:
             return None
-
         try:
             parts = auth_header.split()
             if len(parts) != 2 or parts[0].lower() != 'bearer':
-                raise AuthenticationFailed('Authorization header must be "Bearer <token>"')
-            
+                raise AuthenticationFailed('Authorization header must be "Bearer <token>"')         
             token = parts[1]
-            
-            # Step 1: Verify the token locally (No network call)
             payload = self.verify_token_locally(token)
-            
-            # Step 2: Sync with Django User model
             return self.get_or_create_user(payload)
 
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed("Token expired.")
         except Exception as e:
             raise AuthenticationFailed(f"Auth failed: {str(e)}")
+
 
     def verify_token_locally(self, token):
         import base64
