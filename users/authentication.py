@@ -98,7 +98,7 @@ class SupabaseAuthentication(BaseAuthentication):
             return (user, None)
 
         try:
-            
+            profile_pic = avatar_url
             name = full_name.split(' ', 1)
             if len(name) > 1:
                 f_name = name[0] if len(name) > 0 else ""
@@ -110,6 +110,7 @@ class SupabaseAuthentication(BaseAuthentication):
                 email=email,
                 first_name = f_name,
                 last_name = l_name,
+                profile_pic = profile_pic, 
                 username=email,
                 is_active=True,
                 phone_number=None 
