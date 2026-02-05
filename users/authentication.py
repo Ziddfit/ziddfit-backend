@@ -1,11 +1,11 @@
-# authentication.py
-
 import jwt
-from jwt import PyJWKClient
+import base64
 from rest_framework.authentication import BaseAuthentication
 from rest_framework.exceptions import AuthenticationFailed
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.backends import default_backend
 
 User = get_user_model()
 
@@ -16,66 +16,99 @@ class SupabaseAuthentication(BaseAuthentication):
             return None
 
         try:
-            prefix, token = auth_header.split()
-            if prefix.lower() != 'bearer':
-                raise AuthenticationFailed('Authorization header must start with Bearer')
-        except ValueError:
-            raise AuthenticationFailed('Invalid Authorization header format')
+            parts = auth_header.split()
+            if len(parts) != 2 or parts[0].lower() != 'bearer':
+                raise AuthenticationFailed('Authorization header must be "Bearer <token>"')
+            
+            token = parts[1]
+            
+            # Step 1: Verify the token locally (No network call)
+            payload = self.verify_token_locally(token)
+            
+            # Step 2: Sync with Django User model
+            return self.get_or_create_user(payload)
+
+        except jwt.ExpiredSignatureError:
+            raise AuthenticationFailed("Token expired.")
+        except Exception as e:
+            raise AuthenticationFailed(f"Auth failed: {str(e)}")
+
+    def verify_token_locally(self, token):
+        import base64
+        from cryptography.hazmat.primitives.asymmetric import ec
+        from cryptography.hazmat.backends import default_backend
+
+        # These are the EXACT coordinates you just provided
+        x_str = "J46soCb0LMKLVf_QHyWEKR0w5bB82PShdZdHQrIJf6c"
+        y_str = "FcZ3z3f3uHg6vYV_vaQ92-jS4SPo7TxlJyEtLjwS5TU"
+
+        def b64_decode(data):
+            # Supabase/JWT uses base64url encoding. We must add padding if needed.
+            rem = len(data) % 4
+            if rem > 0:
+                data += "=" * (4 - rem)
+            return base64.urlsafe_b64decode(data)
 
         try:
-            payload = self.verify_token(token)
+            # 1. Decode the coordinates into bytes
+            x_bytes = b64_decode(x_str)
+            y_bytes = b64_decode(y_str)
+
+            # 2. Reconstruct the Public Key from your project's P-256 curve
+            public_key = ec.EllipticCurvePublicNumbers(
+                int.from_bytes(x_bytes, 'big'),
+                int.from_bytes(y_bytes, 'big'),
+                ec.SECP256R1()
+            ).public_key(default_backend())
+
+            # 3. Verify the token signature
+            return jwt.decode(
+                token,
+                public_key,
+                algorithms=["ES256"],
+                audience="authenticated",
+                options={
+                    "verify_exp": True,
+                    "leeway": 60
+                }
+            )
         except Exception as e:
-            raise AuthenticationFailed(f"Invalid token: {str(e)}")
-
-        return self.get_or_create_user(payload)
-
-    def verify_token(self, token):
-        jwks_url = f"{settings.SUPABASE_URL}/auth/v1/keys"
-        jwks_client = PyJWKClient(jwks_url)
-        signing_key = jwks_client.get_signing_key_from_jwt(token)
-
-        return jwt.decode(
-            token,
-            signing_key.key,
-            algorithms=["RS256"],
-            audience="authenticated",
-            options={"verify_exp": True}
-        )
-
+            raise Exception(f"Signature check failed: {str(e)}")
+        
     def get_or_create_user(self, payload):
         supabase_uid = payload.get('sub')
         email = payload.get('email')
         
-        # Metadata from Google/Auth providers
-        user_metadata = payload.get('user_metadata', {})
-        full_name = user_metadata.get('full_name') or user_metadata.get('name', '')
-
         if not supabase_uid:
-            raise AuthenticationFailed('Token missing "sub" claim')
+            raise AuthenticationFailed('Invalid payload: missing sub')
 
-        try:
-            user = User.objects.get(supabase_uid=supabase_uid)
+        # 1. Search by id (which is your supabase_id)
+        user = User.objects.filter(id=supabase_uid).first()
+        if user:
             return (user, None)
-        except User.DoesNotExist:
-            pass
 
-        try:
-            user = User.objects.get(email=email)
-            user.supabase_uid = supabase_uid
+        # 2. Search by email to prevent duplicate accounts if the ID is different
+        user = User.objects.filter(email=email).first()
+        if user:
+            # Optional: Link the ID if it wasn't linked already
+            user.id = supabase_uid
             user.save()
             return (user, None)
-        except User.DoesNotExist:
-            pass
 
-        user = User.objects.create(
-            supabase_uid=supabase_uid,
-            email=email,
-            username=email,  # Fallback: set username same as email
-            first_name=full_name.split(' ')[0] if full_name else '',
-            last_name=' '.join(full_name.split(' ')[1:]) if full_name else '',
-            is_active=True
-        )
-        user.set_unusable_password()
-        user.save()
-
-        return (user, None)
+        # 3. Create new user if not found
+        try:
+            user = User.objects.create(
+                id=supabase_uid,
+                email=email,
+                username=email,
+                is_active=True,
+                # Fix: If your model requires a phone_number but it's unique,
+                # we set it to None (NULL) so the DB doesn't complain about 
+                # multiple empty strings "".
+                phone_number=None 
+            )
+            user.set_unusable_password()
+            user.save()
+            return (user, None)
+        except Exception as e:
+            raise AuthenticationFailed(f"Database error during user creation: {str(e)}")
