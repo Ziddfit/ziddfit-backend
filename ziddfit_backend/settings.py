@@ -85,6 +85,19 @@ DATABASES = {
     }
 }
 
+# Supabase Configuration
+SUPABASE_URL = "https://your-project-ref.supabase.co"
+SUPABASE_JWT_AUDIENCE = "authenticated"  # Default Supabase audience
+
+# DRF Configuration
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'api.authentication.SupabaseAuthentication',  # We will create this file next
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
