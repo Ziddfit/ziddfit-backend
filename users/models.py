@@ -7,6 +7,9 @@ import uuid
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=True) 
     
+    first_name = models.charField(max_length = 255, blank = True)
+    last_name = models.charField(max_length = 255, blank = True)
+
     business_name = models.CharField(max_length=255, blank=True)
     
     subscription = models.ForeignKey(

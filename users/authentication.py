@@ -78,33 +78,38 @@ class SupabaseAuthentication(BaseAuthentication):
     def get_or_create_user(self, payload):
         supabase_uid = payload.get('sub')
         email = payload.get('email')
+
+        metadata = payload.get('user_metadata', {})
+        full_name = metadata.get('full_name', '')
+        avatar_url = metadata.get('avatar_url', '')
+
         
         if not supabase_uid:
             raise AuthenticationFailed('Invalid payload: missing sub')
 
-        # 1. Search by id (which is your supabase_id)
         user = User.objects.filter(id=supabase_uid).first()
         if user:
             return (user, None)
 
-        # 2. Search by email to prevent duplicate accounts if the ID is different
         user = User.objects.filter(email=email).first()
         if user:
-            # Optional: Link the ID if it wasn't linked already
             user.id = supabase_uid
             user.save()
             return (user, None)
 
-        # 3. Create new user if not found
         try:
+            
+            name = full_name.split(' ', 1)
+            if len(name) > 1:
+                f_name = name[0] if len(name) > 0 else ""
+                l_name = name[1] if len(name) > 1 else ""
+
+
             user = User.objects.create(
                 id=supabase_uid,
                 email=email,
                 username=email,
                 is_active=True,
-                # Fix: If your model requires a phone_number but it's unique,
-                # we set it to None (NULL) so the DB doesn't complain about 
-                # multiple empty strings "".
                 phone_number=None 
             )
             user.set_unusable_password()
