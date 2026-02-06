@@ -45,3 +45,27 @@ def member_list(request):
             )
         
 
+@api_view(['GET', 'PATCH'])
+def member_profile(request, memberid):
+    member = get_object_or_404(GymMember, id = memberid, gym__owner = request.user)
+
+    if request.method == 'GET':
+        try:
+            serializer = GymMemberSerializer(member)
+
+            return Response(serializer.data, status = status.HTTP_200_OK)
+        except Exception as e:
+            return Response({ 'error' : 'retrieval failed', 'details' : str(e)}, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+    elif request.method == 'PATCH':
+        try:
+            serializer = GymMemberSerializer(member, request.data, partial = True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status = status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        except Exception as e:
+            return Response({ 'error' : 'update failed', 'details' : str(e)}, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
