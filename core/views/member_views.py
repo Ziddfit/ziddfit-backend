@@ -22,10 +22,12 @@ def member_list(request):
             members = GymMember.objects.filter(gym__owner=request.user)
             if gym_id:
                 members = members.filter(gym__id =gym_id)
-            if active == 'true':
-                members = members.filter(membership_end__gte= timezone.now())
-            if active == 'false':
-                members = members.filter(membership_end__lte = timezone.now())
+            if active:
+                active = active.lower()
+                if active == 'true':
+                    members = members.filter(membership_end__gte= timezone.now())
+                if active == 'false':
+                    members = members.filter(membership_end__lte = timezone.now())
             if search:
                 members = members.filter(
                     Q(user__name__icontains= search) | Q(phone__icontains = search)
