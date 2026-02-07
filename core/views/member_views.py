@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from core.models.gym import Gym
+from django.db.models import Q
 from core.models.members import GymMember
 from core.serializers.member_serializer import GymMemberSerializer
 import datetime
@@ -15,10 +16,9 @@ def member_list(request):
     if request.method == 'GET':
         gym_id = request.query_params.get('gym_id')
         active = request.query_params.get('active')
-        active.lower()
+        search = request.query_params.get('search')
 
         try:
-            
             members = GymMember.objects.filter(gym__owner=request.user)
             if gym_id:
                 members = members.filter(gym__id =gym_id)
@@ -26,6 +26,10 @@ def member_list(request):
                 members = members.filter(membership_end__gte= timezone.now())
             if active == 'false':
                 members = members.filter(membership_end__lte = timezone.now())
+            if search:
+                members = members.filter(
+                    Q(user__name__icontains= search) | Q(phone__icontains = search)
+                )
 
             serializer = GymMemberSerializer(members, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
