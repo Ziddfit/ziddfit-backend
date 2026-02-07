@@ -1,6 +1,6 @@
 from django.urls import path
-from users.views import *
+from . import views
 
 urlpatterns = [
-    # User routes will be defined here
+    path('me/', views.user_Profile, name='get_current_user'),
 ]

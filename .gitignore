@@ -56,3 +56,6 @@ dmypy.json
 *.pid
 *.seed
 *.pid.lock
+
+debug.html
+index.html
