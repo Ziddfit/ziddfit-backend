@@ -3,16 +3,38 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 from core.models.gym import Gym
+from django.db.models import Q
 from core.models.members import GymMember
 from core.serializers.member_serializer import GymMemberSerializer
+import datetime
+from django.utils import timezone
 
 
 #this is the gym member CREATE and READ function
 @api_view(['GET', 'POST'])
 def member_list(request):
     if request.method == 'GET':
+        gym_id = request.query_params.get('gym_id')
+        active = request.query_params.get('active')
+        search = request.query_params.get('search')
+
         try:
             members = GymMember.objects.filter(gym__owner=request.user)
+            if gym_id:
+                members = members.filter(gym__id =gym_id)
+            if active:
+                active = active.lower()
+                if active == 'true':
+                    members = members.filter(membership_end__gte= timezone.now().date())
+                if active == 'false':
+                    members = members.filter(membership_end__lte = timezone.now().date())
+            if search:
+                members = members.filter(
+                    Q(user__first_name__icontains = search) | 
+                    Q(user__last_name__icontains = search) |
+                    Q(phone__icontains = search)
+                )
+
             serializer = GymMemberSerializer(members, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
