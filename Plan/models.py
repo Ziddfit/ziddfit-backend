@@ -1,15 +1,16 @@
 from django.db import models
 from django.conf import settings
-from django.contrib.postgres.indexes import GinIndex
-import uuid
 
-class Plan(models.Model):
-    PLAN_CHOICES = [
-        ('free', 'Free Tier'),
-        ('pro', 'Professional'),
-        ('enterprise', 'Enterprise'),
-    ]
-    plan_name = models.CharField(max_length=20, choices=PLAN_CHOICES, default='free')
-    is_active = models.BooleanField(default = True)
-    start_date = models.DateTimeField(auto_now_add=True)
-    expiry_date = models.DateTimeField(null=True, blank=True)
+class Plan_config(models.Model):
+    tier = models.CharField(max_length=20,unique=True)
+    monthly_price = models.DecimalField(max_digits=10,decimal_places=2)
+
+class Plan_Subcription(models.Model):
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='plan_subcription'
+    )
+    plan = models.ForeignKey(Plan_config,on_delete=models.PROTECT)
+    is_active = models.BooleanField(default=True)
+    
