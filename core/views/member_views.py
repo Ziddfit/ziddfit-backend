@@ -15,6 +15,7 @@ def member_list(request):
     if request.method == 'GET':
         gym_id = request.query_params.get('gym_id')
         active = request.query_params.get('active')
+        active.lower()
 
         try:
             
@@ -23,6 +24,8 @@ def member_list(request):
                 members = members.filter(gym__id =gym_id)
             if active == 'true':
                 members = members.filter(membership_end__gte= timezone.now())
+            if active == 'false':
+                members = members.filter(membership_end__lte = timezone.now())
 
             serializer = GymMemberSerializer(members, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
