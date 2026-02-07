@@ -19,14 +19,11 @@ def member_list(request):
         try:
             
             members = GymMember.objects.filter(gym__owner=request.user)
-
             if gym_id:
-                members = members.objects.filter(gym__id =gym_id)
-
+                members = members.filter(gym__id =gym_id)
             if active == 'true':
-                members = members.objects.filter(membership_end__gte= timezone.now())
+                members = members.filter(membership_end__gte= timezone.now())
 
-            
             serializer = GymMemberSerializer(members, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
