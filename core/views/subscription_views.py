@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 
-from core.models.subscriptions import GymSubscription
+from core.models.subscription import GymSubscription
 from core.models.members import GymMember
 from core.serializers.subscription_serializer import GymSubscriptionSerializer
 
