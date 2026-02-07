@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from core.models.gym import Gym
 from core.models.members import GymMember
 from core.serializers.member_serializer import GymMemberSerializer
+import datetime
+from django.utils import timezone
 
 
 #this is the gym member CREATE and READ function
@@ -12,6 +14,7 @@ from core.serializers.member_serializer import GymMemberSerializer
 def member_list(request):
     if request.method == 'GET':
         gym_id = request.query_params.get('gym_id')
+        active = request.query_params.get('active')
 
         try:
             
@@ -19,6 +22,11 @@ def member_list(request):
 
             if gym_id:
                 members = members.objects.filter(gym__id =gym_id)
+
+            if active == 'true':
+                members = members.objects.filter(membership_end__gte= timezone.now())
+
+            
             serializer = GymMemberSerializer(members, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
