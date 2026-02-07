@@ -25,9 +25,9 @@ def member_list(request):
             if active:
                 active = active.lower()
                 if active == 'true':
-                    members = members.filter(membership_end__gte= timezone.now())
+                    members = members.filter(membership_end__gte= timezone.now().date())
                 if active == 'false':
-                    members = members.filter(membership_end__lte = timezone.now())
+                    members = members.filter(membership_end__lte = timezone.now().date())
             if search:
                 members = members.filter(
                     Q(user__name__icontains= search) | Q(phone__icontains = search)
