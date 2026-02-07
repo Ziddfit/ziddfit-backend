@@ -11,8 +11,14 @@ from core.serializers.member_serializer import GymMemberSerializer
 @api_view(['GET', 'POST'])
 def member_list(request):
     if request.method == 'GET':
+        gym_id = request.query_params.get('gym_id')
+
         try:
+            
             members = GymMember.objects.filter(gym__owner=request.user)
+
+            if gym_id:
+                members = members.objects.filter(gym__id =gym_id)
             serializer = GymMemberSerializer(members, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
