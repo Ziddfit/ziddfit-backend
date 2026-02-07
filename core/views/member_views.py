@@ -30,7 +30,9 @@ def member_list(request):
                     members = members.filter(membership_end__lte = timezone.now().date())
             if search:
                 members = members.filter(
-                    Q(user__name__icontains= search) | Q(phone__icontains = search)
+                    Q(user__first_name__icontains = search) | 
+                    Q(user__last_name__icontains = search) |
+                    Q(phone__icontains = search)
                 )
 
             serializer = GymMemberSerializer(members, many=True)
