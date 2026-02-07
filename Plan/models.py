@@ -1,11 +1,19 @@
 from django.db import models
 from django.conf import settings
+import uuid
 
 class Plan_config(models.Model):
-    tier = models.CharField(max_length=20,unique=True)
+    PLAN_CHOICES = [
+        ('free', 'Free Tier'),
+        ('pro', 'Professional'),
+        ('enterprise', 'Enterprise'),
+    ]
+    tier = models.CharField(max_length=20,choices=PLAN_CHOICES,unique=True)
     monthly_price = models.DecimalField(max_digits=10,decimal_places=2)
+    description = models.CharField(null=True,blank=True)
 
 class Plan_Subcription(models.Model):
+    id = models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -13,4 +21,6 @@ class Plan_Subcription(models.Model):
     )
     plan = models.ForeignKey(Plan_config,on_delete=models.PROTECT)
     is_active = models.BooleanField(default=True)
+    start_date = models.DateTimeField(auto_now_add=True)
+    expiry_date = models.DateTimeField(null=True, blank=True)
     
