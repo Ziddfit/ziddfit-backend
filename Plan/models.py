@@ -21,4 +21,6 @@ class Plan_Subcription(models.Model):
     )
     plan = models.ForeignKey(Plan_config,on_delete=models.PROTECT)
     is_active = models.BooleanField(default=True)
+    start_date = models.DateTimeField(auto_now_add=True)
+    expiry_date = models.DateTimeField(null=True, blank=True)
     
