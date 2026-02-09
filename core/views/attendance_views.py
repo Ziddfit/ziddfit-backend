@@ -71,7 +71,7 @@ def attendance_list(request, gym_id):
         if entry_source:
             attendances = attendances.filter(entry_source=entry_source)
         
-        paginator = StandardResultsPagination()
+        paginator = StandardResultsPagination(20, 100)
         paginated_qs = paginator.paginate_queryset(attendances, request)
 
         serializer = GymAttendanceSerializer(paginated_qs, many=True)
