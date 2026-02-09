@@ -12,6 +12,7 @@ from core.models.gym import Gym
 from core.models.members import GymMember
 from core.serializers.attendance_serializer import GymAttendanceSerializer
 from core.pagination import StandardResultsPagination
+
 @api_view(['GET', 'POST'])
 def attendance_list(request, gym_id):
     if request.method == 'GET':
