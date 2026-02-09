@@ -13,6 +13,7 @@ from core.models.members import GymMember
 from core.serializers.attendance_serializer import GymAttendanceSerializer
 from core.pagination import StandardResultsPagination
 
+
 @api_view(['GET', 'POST'])
 def attendance_list(request, gym_id):
     if request.method == 'GET':
@@ -29,7 +30,7 @@ def attendance_list(request, gym_id):
         if date_from:
             try:
                 date_from_obj = datetime.strptime(date_from, '%Y-%m-%d')
-                attendances = attendances.filter(date__gte=date_from)
+                attendances = attendances.filter(date__gte=date_from_obj)
             except ValueError:
                     return Response(
                         {
@@ -45,7 +46,7 @@ def attendance_list(request, gym_id):
             try:
                 date_to_obj = datetime.strptime(date_to, '%Y-%m-%d')
                 date_to_obj = date_to_obj.replace(hour = 23, minute = 59, second = 59)
-                attendances = attendances.filter(date__lte=date_to)
+                attendances = attendances.filter(date__lte=date_to_obj)
 
             except ValueError:
                 return Response(
@@ -70,7 +71,7 @@ def attendance_list(request, gym_id):
         if entry_source:
             attendances = attendances.filter(entry_source=entry_source)
         
-        paginator = StandardResultsPagination()
+        paginator = StandardResultsPagination(20, 100)
         paginated_qs = paginator.paginate_queryset(attendances, request)
 
         serializer = GymAttendanceSerializer(paginated_qs, many=True)
