@@ -11,7 +11,7 @@ from core.models.attendance import GymAttendance
 from core.models.gym import Gym
 from core.models.members import GymMember
 from core.serializers.attendance_serializer import GymAttendanceSerializer
-from core.pagination import StandardResultsPagination
+from utils.pagination import StandardResultsPagination
 
 
 @api_view(['GET', 'POST'])
