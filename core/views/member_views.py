@@ -6,7 +6,7 @@ from core.models.gym import Gym
 from django.db.models import Q
 from core.models.members import GymMember
 from core.serializers.member_serializer import GymMemberSerializer
-import datetime
+from datetime import datetime
 from django.utils import timezone
 
 
