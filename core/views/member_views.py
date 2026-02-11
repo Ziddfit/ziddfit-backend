@@ -8,6 +8,7 @@ from core.models.members import GymMember
 from core.serializers.member_serializer import GymMemberSerializer
 from datetime import datetime
 from django.utils import timezone
+from utils.pagination import StandardResultsPagination
 
 
 #this is the gym member CREATE and READ function
@@ -35,8 +36,11 @@ def member_list(request):
                     Q(phone__icontains = search)
                 )
 
-            serializer = GymMemberSerializer(members, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            paginator = StandardResultsPagination()
+            paginated_qs = paginator.paginate_queryset(members, request)
+
+            serializer = GymMemberSerializer(paginated_qs, many=True)
+            return paginator.get_paginated_response(serializer.data)
         except Exception as e:
             return Response(
                 {"error": "Retrieval failed", "details": str(e)},
