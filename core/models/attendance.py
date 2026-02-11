@@ -25,6 +25,6 @@ class GymAttendance(models.Model):
                 name='unique_daily_attendance'
             )
         ]
-    indexes = [
+        indexes = [
             models.Index(fields=['gym', 'member', 'date']), 
         ]
