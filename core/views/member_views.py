@@ -13,9 +13,9 @@ from utils.pagination import StandardResultsPagination
 
 #this is the gym member CREATE and READ function
 @api_view(['GET', 'POST'])
-def member_list(request):
+def member_list(request, gym_id):
+    gym = get_object_or_404(Gym, id=gym_id, owner=request.user)
     if request.method == 'GET':
-        gym_id = request.query_params.get('gym_id')
         active = request.query_params.get('active')
         search = request.query_params.get('search')
 
@@ -72,8 +72,8 @@ def member_list(request):
         
 
 @api_view(['GET', 'PATCH'])
-def member_profile(request, memberid):
-    member = get_object_or_404(GymMember, id = memberid, gym__owner = request.user)
+def member_profile(request,  gym_id, member_id):
+    member = get_object_or_404(GymMember, id = member_id ,gym_id=gym_id , gym__owner = request.user)
 
     if request.method == 'GET':
         try:
