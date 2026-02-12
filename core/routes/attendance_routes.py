@@ -11,5 +11,5 @@ urlpatterns = [
 
     path('attendance/<uuid:attendance_id>/', attendance_detail, name='attendance-detail'),
 
-    path('attendance/checkin/', attendance_checkin, name='attendance-checkin'),
+    path('attendance/checkin/<uuid:gym_id>/', attendance_checkin, name='attendance-checkin'),
 ]

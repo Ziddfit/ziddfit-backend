@@ -2,6 +2,7 @@ from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
+from utils.pagination import StandardResultsPagination
 
 from core.models.subscription import GymSubscription
 from core.models.members import GymMember
@@ -17,8 +18,11 @@ def subscription_list(request):
             subscriptions = GymSubscription.objects.filter(
                 member__gym__owner=request.user
             )
-            serializer = GymSubscriptionSerializer(subscriptions, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            paginator = StandardResultsPagination()
+            paginated_qs = paginator.paginate_queryset(subscriptions, request)
+
+            serializer = GymSubscriptionSerializer(paginated_qs, many=True)
+            return paginator.get_paginated_response(serializer.data)
 
         except Exception as e:
             return Response(

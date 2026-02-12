@@ -29,7 +29,7 @@ class GymSubscription(models.Model):
         default='MONTHLY'
     )
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    discount = models.PositiveIntegerField(help_text = "current available discount")
+    discount_percent = models.PositiveSmallIntegerField(default=0) 
     is_active = models.BooleanField(default = True)
     start_date = models.DateField(auto_now_add=True)
     end_date = models.DateField(null=True, blank=True)

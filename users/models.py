@@ -5,23 +5,11 @@ from django.contrib.postgres.indexes import GinIndex
 import uuid
 
 class User(AbstractUser):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=True) 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) 
     
-    first_name = models.CharField(max_length = 255, blank = True)
-    last_name = models.CharField(max_length = 255, blank = True)
-
-    business_name = models.CharField(max_length=255, blank=True)
-
-    profile_pic = models.CharField(max_length = 1000, blank = True)
-    
-    subscription = models.ForeignKey(
-        'Plan.Plan', 
-        on_delete=models.SET_NULL, 
-        null=True, 
-        blank=True,
-        related_name='users'
-    )
-    
+    first_name = models.CharField(max_length=255, blank=True)
+    last_name = models.CharField(max_length=255, blank=True)
+    profile_pic = models.CharField(max_length=1000, blank=True)
     phone_number = models.CharField(
         max_length=15,
         unique=True,
@@ -29,7 +17,6 @@ class User(AbstractUser):
         blank=True,
         default=None 
     )
-    
     email = models.EmailField(unique=True)
 
     USERNAME_FIELD = 'email'

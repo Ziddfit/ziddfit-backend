@@ -1,5 +1,5 @@
 from django.urls import path
-from core.views.gym_staff import staff_list, staff_detail
+from core.views.gym_staff_views import staff_list, staff_detail
 
 
 urlpatterns = [

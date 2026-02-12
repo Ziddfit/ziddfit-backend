@@ -2,19 +2,21 @@ from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
-
 from core.models.gym import Gym
 from core.models.gym_staff import GymStaff
 from core.serializers.gym_staff_serializer import GymStaffSerializer
-
+from utils.pagination import StandardResultsPagination
 @api_view(['GET', 'POST'])
 def staff_list(request):
     # -------- GET: List staff for owner's gyms --------
     if request.method == 'GET':
         try:
             staff = GymStaff.objects.filter(gym__owner=request.user)
-            serializer = GymStaffSerializer(staff, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            paginator = StandardResultsPagination()
+            paginated_qs = paginator.paginate_queryset(staff, request)
+
+            serializer = GymStaffSerializer(paginated_qs, many=True)
+            return paginator.get_paginated_response(serializer.data)
 
         except Exception as e:
             return Response(
