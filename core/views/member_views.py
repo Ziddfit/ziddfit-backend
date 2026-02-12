@@ -6,15 +6,16 @@ from core.models.gym import Gym
 from django.db.models import Q
 from core.models.members import GymMember
 from core.serializers.member_serializer import GymMemberSerializer
-import datetime
+from datetime import datetime
 from django.utils import timezone
+from utils.pagination import StandardResultsPagination
 
 
 #this is the gym member CREATE and READ function
 @api_view(['GET', 'POST'])
-def member_list(request):
+def member_list(request, gym_id):
+    gym = get_object_or_404(Gym, id=gym_id, owner=request.user)
     if request.method == 'GET':
-        gym_id = request.query_params.get('gym_id')
         active = request.query_params.get('active')
         search = request.query_params.get('search')
 
@@ -35,8 +36,11 @@ def member_list(request):
                     Q(phone__icontains = search)
                 )
 
-            serializer = GymMemberSerializer(members, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            paginator = StandardResultsPagination()
+            paginated_qs = paginator.paginate_queryset(members, request)
+
+            serializer = GymMemberSerializer(paginated_qs, many=True)
+            return paginator.get_paginated_response(serializer.data)
         except Exception as e:
             return Response(
                 {"error": "Retrieval failed", "details": str(e)},
@@ -68,8 +72,8 @@ def member_list(request):
         
 
 @api_view(['GET', 'PATCH'])
-def member_profile(request, memberid):
-    member = get_object_or_404(GymMember, id = memberid, gym__owner = request.user)
+def member_profile(request,  gym_id, member_id):
+    member = get_object_or_404(GymMember, id = member_id ,gym_id=gym_id , gym__owner = request.user)
 
     if request.method == 'GET':
         try:

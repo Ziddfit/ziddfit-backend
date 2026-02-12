@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from models import Plan_Subcription, Plan_config
+from .models import Plan_Subcription, Plan_config
 from users.serializer import UserSerializer
 
 class Plan_con_Serializer(serializers.ModelSerializer):

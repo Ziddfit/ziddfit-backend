@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from models import Plan_config,Plan_Subcription
+from .models import Plan_config,Plan_Subcription
 from django.contrib.auth import get_user_model
 
 user = get_user_model()

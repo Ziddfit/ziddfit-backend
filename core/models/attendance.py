@@ -25,6 +25,6 @@ class GymAttendance(models.Model):
                 name='unique_daily_attendance'
             )
         ]
-    indexes = [
-            models.Index(fields=['gym', 'member', 'checkin_date']), 
+        indexes = [
+            models.Index(fields=['gym', 'member', 'date']), 
         ]
