@@ -21,6 +21,7 @@ class Plan_sub_Serializer(serializers.ModelSerializer):
         model = Plan_Subcription
         fields = [
             'id', 
+            'user',
             'plan', 
             'is_active', 
             'expiry_date', 
