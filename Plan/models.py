@@ -8,9 +8,13 @@ class Plan_config(models.Model):
         ('pro', 'Professional'),
         ('enterprise', 'Enterprise'),
     ]
-    tier = models.CharField(max_length=20,choices=PLAN_CHOICES,unique=True)
-    monthly_price = models.DecimalField(max_digits=10,decimal_places=2)
-    description = models.CharField(null=True,blank=True)
+    tier = models.CharField(max_length=20, choices=PLAN_CHOICES, unique=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    duration_days = models.PositiveIntegerField()
+    description = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return self.tier
 
 class Plan_Subcription(models.Model):
     id = models.UUIDField(primary_key=True,default=uuid.uuid4,editable=False)
@@ -23,4 +27,10 @@ class Plan_Subcription(models.Model):
     is_active = models.BooleanField(default=True)
     start_date = models.DateTimeField(auto_now_add=True)
     expiry_date = models.DateTimeField(null=True, blank=True)
-    
+    class Meta:
+        indexes = [
+            models.Index(fields=['is_active']),
+            models.Index(fields=['expiry_date']),
+        ]
+    def __str__(self):
+        return f"{self.user.email} - {self.plan.tier}"
