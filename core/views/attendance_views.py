@@ -19,7 +19,7 @@ def attendance_list(request, gym_id):
     if request.method == 'GET':
         attendances = GymAttendance.objects.filter(
             gym_id=gym_id,
-            gym__owner=request.user
+            gym__owner=request.user.owner_profile
         ).select_related('member', 'gym')
 
         member_id = request.query_params.get('member_id')
@@ -80,7 +80,7 @@ def attendance_list(request, gym_id):
     if request.method == 'POST':
         serializer = GymAttendanceSerializer(data=request.data)
         if serializer.is_valid():
-            gym = get_object_or_404(Gym, id=gym_id, owner=request.user)
+            gym = get_object_or_404(Gym, id=gym_id, owner=request.user.owner_profile)
 
             member = serializer.validated_data.get('member')
             
@@ -96,7 +96,7 @@ def attendance_detail(request, attendance_id):
     attendance = get_object_or_404(
         GymAttendance,
         pk=attendance_id,
-        gym__owner=request.user
+        gym__owner=request.user.owner_profile
     )
 
     if request.method == 'GET':
@@ -167,7 +167,7 @@ def attendance_today(request, gym_id):
 
 @api_view(['GET'])
 def attendance_stats(request, gym_id):
-    gym = get_object_or_404(Gym, pk=gym_id, owner=request.user)
+    gym = get_object_or_404(Gym, pk=gym_id, owner=request.user.owner_profile)
     days = int(request.query_params.get('days', 7))
     date_from = timezone.now().date() - timedelta(days=days)
 

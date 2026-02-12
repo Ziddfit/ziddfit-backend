@@ -14,13 +14,13 @@ from utils.pagination import StandardResultsPagination
 #this is the gym member CREATE and READ function
 @api_view(['GET', 'POST'])
 def member_list(request, gym_id):
-    gym = get_object_or_404(Gym, id=gym_id, owner=request.user)
+    gym = get_object_or_404(Gym, id=gym_id, owner=request.user.owner_profile)
     if request.method == 'GET':
         active = request.query_params.get('active')
         search = request.query_params.get('search')
 
         try:
-            members = GymMember.objects.filter(gym__owner=request.user)
+            members = GymMember.objects.filter(gym__owner=request.user.owner_profile)
             if gym_id:
                 members = members.filter(gym__id =gym_id)
             if active:
@@ -73,7 +73,7 @@ def member_list(request, gym_id):
 
 @api_view(['GET', 'PATCH'])
 def member_profile(request,  gym_id, member_id):
-    member = get_object_or_404(GymMember, id = member_id ,gym_id=gym_id , gym__owner = request.user)
+    member = get_object_or_404(GymMember, id = member_id ,gym_id=gym_id , gym__owner = request.user.owner_profile)
 
     if request.method == 'GET':
         try:

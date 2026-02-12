@@ -11,7 +11,7 @@ def staff_list(request):
     # -------- GET: List staff for owner's gyms --------
     if request.method == 'GET':
         try:
-            staff = GymStaff.objects.filter(gym__owner=request.user)
+            staff = GymStaff.objects.filter(gym__owner=request.user.owner_profile)
             paginator = StandardResultsPagination()
             paginated_qs = paginator.paginate_queryset(staff, request)
 
@@ -55,7 +55,7 @@ def staff_detail(request, pk):
         staff = get_object_or_404(
             GymStaff,
             pk=pk,
-            gym__owner=request.user
+            gym__owner=request.user.owner_profile
         )
 
     except Exception as e:
