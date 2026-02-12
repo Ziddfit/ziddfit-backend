@@ -1,7 +1,8 @@
 from django.db import models
+from django.conf import settings
 from users.models import User
 
-class Owner(User):
+class Owner(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
