@@ -22,6 +22,7 @@ def gym_list(request):
     elif request.method == 'POST':
         try:
             serializer = GymSerializer(data = request.data)
+            print(request.user)
             if serializer.is_valid():
                 serializer.save(owner=request.user.owner_profile)
                 return Response( serializer.data, status = status.HTTP_201_CREATED)
@@ -43,8 +44,15 @@ def gym_detail(request, gym_id):
         serializer = GymSerializer(gym)
         return Response(serializer.data)
     
-    if request.method == 'PUT':
+    if request.method == 'PATCH':
         serializer = GymSerializer(gym, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    if request.method == 'PUT':
+        serializer = GymSerializer(gym, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
