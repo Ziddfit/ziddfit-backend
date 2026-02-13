@@ -6,6 +6,7 @@ import uuid
 
 class User(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False) 
+    supabase_uid = models.UUIDField(unique=True, null=True, blank=True)
     
     first_name = models.CharField(max_length=255, blank=True)
     last_name = models.CharField(max_length=255, blank=True)
