@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated,AllowAny
 from rest_framework.response import Response
 from rest_framework import status
 
-from models import Plan_config,Plan_Subcription
+from .models import Plan_config,Plan_Subcription
 from serializer import Plan_con_Serializer,Plan_sub_Serializer
 
 @api_view(['GET'])
