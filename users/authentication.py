@@ -71,46 +71,46 @@ class SupabaseAuthentication(BaseAuthentication):
             raise Exception(f"Signature check failed: {str(e)}")
 
 
-def get_or_create_user(self, payload):
-    supabase_uid = payload.get("sub")
-    email = payload.get("email")
-
-    metadata = payload.get("user_metadata", {})
-    full_name = metadata.get("full_name", "")
-    avatar_url = metadata.get("avatar_url", "")
-
-    if not supabase_uid:
-        raise AuthenticationFailed("Invalid payload: missing sub")
-
-    name_parts = full_name.split(" ", 1)
-    f_name = name_parts[0] if len(name_parts) > 0 else ""
-    l_name = name_parts[1] if len(name_parts) > 1 else ""
-
-    user = User.objects.filter(supabase_uid=supabase_uid).first()
-    if user:
-        return (user, None)
-
-    user = User.objects.filter(email=email).first()
-    if user:
-        user.supabase_uid = supabase_uid
-        if not user.profile_pic:
-            user.profile_pic = avatar_url
-        user.save()
-        return (user, None)
-
-    try:
-        user = User.objects.create(
-            supabase_uid=supabase_uid,
-            email=email,
-            first_name=f_name,
-            last_name=l_name,
-            profile_pic=avatar_url,
-            username=email,
-            is_active=True,
-        )
-        user.set_unusable_password()
-        user.save()
-        return (user, None)
-
-    except Exception as e:
-        raise AuthenticationFailed(f"Database error during user creation: {str(e)}")
+    def get_or_create_user(self, payload):
+        supabase_uid = payload.get("sub")
+        email = payload.get("email")
+    
+        metadata = payload.get("user_metadata", {})
+        full_name = metadata.get("full_name", "")
+        avatar_url = metadata.get("avatar_url", "")
+    
+        if not supabase_uid:
+            raise AuthenticationFailed("Invalid payload: missing sub")
+    
+        name_parts = full_name.split(" ", 1)
+        f_name = name_parts[0] if len(name_parts) > 0 else ""
+        l_name = name_parts[1] if len(name_parts) > 1 else ""
+    
+        user = User.objects.filter(supabase_uid=supabase_uid).first()
+        if user:
+            return (user, None)
+    
+        user = User.objects.filter(email=email).first()
+        if user:
+            user.supabase_uid = supabase_uid
+            if not user.profile_pic:
+                user.profile_pic = avatar_url
+            user.save()
+            return (user, None)
+    
+        try:
+            user = User.objects.create(
+                supabase_uid=supabase_uid,
+                email=email,
+                first_name=f_name,
+                last_name=l_name,
+                profile_pic=avatar_url,
+                username=email,
+                is_active=True,
+            )
+            user.set_unusable_password()
+            user.save()
+            return (user, None)
+    
+        except Exception as e:
+            raise AuthenticationFailed(f"Database error during user creation: {str(e)}")
