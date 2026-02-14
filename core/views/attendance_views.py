@@ -129,7 +129,7 @@ def attendance_checkin(request,gym_id):
             {'error': 'member_id is required'},
             status=status.HTTP_400_BAD_REQUEST
         )
-    gym = get_object_or_404(Gym, pk=gym_id, owner=request.user)
+    gym = get_object_or_404(Gym, pk=gym_id, owner=request.user.owner_profile)
     member = get_object_or_404(GymMember, pk=member_id, gym=gym)
 
     try:
@@ -151,7 +151,7 @@ def attendance_checkin(request,gym_id):
 
 @api_view(['GET'])
 def attendance_today(request, gym_id):
-    gym = get_object_or_404(Gym, pk=gym_id, owner=request.user)
+    gym = get_object_or_404(Gym, pk=gym_id, owner=request.user.owner_profile)
     today = timezone.now().date()
 
     attendances = GymAttendance.objects.filter(
