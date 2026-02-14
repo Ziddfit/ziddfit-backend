@@ -36,3 +36,4 @@ class GymMember(models.Model):
         indexes = [
             models.Index(fields=['membership_end']),
         ]
+        unique_together = [['user', 'gym']]
