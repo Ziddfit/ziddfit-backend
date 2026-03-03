@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/6.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
-
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -84,14 +83,12 @@ AUTH_USER_MODEL = 'users.User'
 # If using the dictionary:
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ziddfit-dev',  # Update this!
-        'USER': 'postgres',
-        'PASSWORD': 'your_password',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+DATABASE_ROUTERS = ['ziddfit.db_router.AnalyticsRouter']
 
 # Supabase Configuration
 SUPABASE_URL = "https://toiwsjvxlmoxuyfprafb.supabase.co"
