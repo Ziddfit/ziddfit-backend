@@ -80,18 +80,15 @@ AUTH_USER_MODEL = 'users.User'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# If using the dictionary:
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ziddfit-dev',           # from dbname
-        'USER': 'postgres',           # from user
-        'PASSWORD': 'Mrinmoy100',  # from password
-        'HOST': 'localhost',          # from host
-        'PORT': '5432',               # from port
-        'OPTIONS': {
-            'connect_timeout': 10,    # from connect_timeout
-            'sslmode': 'prefer',      # from sslmode
-        }
+        'NAME': 'ziddfit-dev',  # Update this!
+        'USER': 'postgres',
+        'PASSWORD': 'Mrinmoy100',
+        'HOST': '127.0.0.1',
+        'PORT': '5432',
     }
 }
 
