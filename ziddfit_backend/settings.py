@@ -89,8 +89,18 @@ DATABASES = {
         'PASSWORD': 'Mrinmoy100',
         'HOST': '127.0.0.1',
         'PORT': '5432',
+    },
+    'read_replica' : {
+        'ENGINE': 'django.db.backends.postgresql', # Or even a different engine!
+        'NAME': 'ziddfit-dev',
+        'USER': 'postgres',
+        'PASSWORD': 'Mrinmoy100',
+        'HOST': '127.0.0.1',
+        'PORT': '5433',
     }
 }
+
+DATABASE_ROUTERS = ['ziddfit.db_router.AnalyticsRouter']
 
 # Supabase Configuration
 SUPABASE_URL = "https://toiwsjvxlmoxuyfprafb.supabase.co"
