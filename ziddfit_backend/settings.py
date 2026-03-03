@@ -83,20 +83,8 @@ AUTH_USER_MODEL = 'users.User'
 # If using the dictionary:
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'ziddfit-dev',  # Update this!
-        'USER': 'postgres',
-        'PASSWORD': 'Mrinmoy100',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
-    },
-    'read_replica' : {
-        'ENGINE': 'django.db.backends.postgresql', # Or even a different engine!
-        'NAME': 'ziddfit-dev',
-        'USER': 'postgres',
-        'PASSWORD': 'Mrinmoy100',
-        'HOST': '127.0.0.1',
-        'PORT': '5433',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
