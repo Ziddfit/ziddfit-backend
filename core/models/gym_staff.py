@@ -1,11 +1,10 @@
+import uuid
 from django.db import models
 from django.conf import settings
-import uuid
-from core.models.gym import Gym
+from ..models.gym import Gym 
 
 class GymStaff(models.Model):
     ROLE_CHOICES = [
-        ('OWNER', 'Owner'),
         ('MANAGER', 'Manager'),
         ('TRAINER', 'Trainer'),
         ('RECEPTIONIST', 'Receptionist'),
@@ -13,17 +12,22 @@ class GymStaff(models.Model):
         ('SECURITY', 'Security'),
         ('OTHER', 'Other'),
     ]
+    
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='staff_profile',
+        null=True,
+        blank=True
+    )
 
     gym = models.ForeignKey(
         Gym,
         on_delete=models.CASCADE,
         related_name='staff'
     )
-
-    full_name = models.CharField(max_length=255)
-    phone = models.CharField(max_length=20)
-    email = models.EmailField(null=True, blank=True)
 
     role = models.CharField(
         max_length=30,
@@ -40,11 +44,14 @@ class GymStaff(models.Model):
     shift_end = models.TimeField(null=True, blank=True)
 
     is_active = models.BooleanField(default=True)
-    
     extra_info = models.JSONField(default=dict, blank=True)
 
     class Meta:
-        unique_together = ('gym', 'phone')
+        # Since 'user' handles the unique identity now, 
+        # we index gym and role for fast searching.
         indexes = [
             models.Index(fields=['gym', 'role']),
         ]
+
+    def __str__(self):
+        return f"{self.user.email if self.user else 'Unlinked Staff'} - {self.role}"

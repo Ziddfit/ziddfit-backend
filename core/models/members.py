@@ -1,40 +1,39 @@
+import uuid
 from django.db import models
 from django.conf import settings
-#from django.contrib.postgres.indexes import GinIndex
-import uuid
-from core.models.gym import Gym
-
+from ..models.gym import Gym
 
 class GymMember(models.Model):
-    """A gym-specific member record.
-
-    This is a profile-like model that links to the project's user model
-    (configured via `AUTH_USER_MODEL`) instead of subclassing
-    `AbstractUser`. Only `users.User` should subclass `AbstractUser`.
     """
-
+    A gym-specific member profile. 
+    Links a Global User to a specific Gym and handles subscription/tracking.
+    """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='gym_profile',
-        null=True,
-        blank=True,
+        help_text="The global identity associated with this gym membership."
     )
+
     gym = models.ForeignKey(
         Gym,
         on_delete=models.CASCADE,
         related_name='members'
     )
-    email = models.EmailField(null=True)
-    phone = models.CharField(max_length=20)
+
     membership_start = models.DateField(auto_now_add=True)
-    membership_end = models.DateField()
+    membership_end = models.DateField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
 
     extra_info = models.JSONField(default=dict, blank=True)
 
-    #class Meta:
-    #    indexes = [
-    #        GinIndex(fields=['extra_info']),
-    #    ]
+    def __str__(self):
+        return f"{self.user.email} - {self.gym.name}"
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['membership_end']),
+        ]
+        unique_together = [['user', 'gym']]

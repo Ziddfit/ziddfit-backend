@@ -4,4 +4,5 @@ from core.models.gym import Gym
 class GymSerializer(serializers.ModelSerializer):
     class Meta:
         model = Gym
-        fields = '__all__'
+        fields = ["id", "owner", "name", "created_at"]
+        read_only_fields = ["id", "owner", "created_at"]

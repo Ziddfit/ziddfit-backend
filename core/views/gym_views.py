@@ -11,7 +11,7 @@ from core.serializers.gym_serializer import GymSerializer
 def gym_list(request):
     if request.method == 'GET':
         try:
-            gyms = Gym.objects.filter(owner = request.user)
+            gyms = Gym.objects.filter(owner = request.user.owner_profile)
             serializer = GymSerializer(gyms, many=True)
 
             return Response( serializer.data, status = status.HTTP_200_OK)
@@ -22,8 +22,9 @@ def gym_list(request):
     elif request.method == 'POST':
         try:
             serializer = GymSerializer(data = request.data)
+            print(request.user)
             if serializer.is_valid():
-                serializer.save(owner=request.user)
+                serializer.save(owner=request.user.owner_profile)
                 return Response( serializer.data, status = status.HTTP_201_CREATED)
                 
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -38,13 +39,20 @@ def gym_list(request):
 @api_view(['PUT', 'PATCH', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def gym_detail(request, gym_id):
-    gym = get_object_or_404(Gym, pk=gym_id, owner=request.user)
+    gym = get_object_or_404(Gym, pk=gym_id, owner=request.user.owner_profile)
     if request.method == 'GET':
         serializer = GymSerializer(gym)
         return Response(serializer.data)
     
-    if request.method == 'PUT':
+    if request.method == 'PATCH':
         serializer = GymSerializer(gym, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    if request.method == 'PUT':
+        serializer = GymSerializer(gym, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

@@ -4,14 +4,14 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.db.models import Count
 from django.db.models.functions import TruncDate
-import datetime
+from datetime import datetime
 from datetime import timedelta
 from rest_framework.response import Response
 from core.models.attendance import GymAttendance
 from core.models.gym import Gym
 from core.models.members import GymMember
 from core.serializers.attendance_serializer import GymAttendanceSerializer
-from core.pagination import StandardResultsPagination
+from utils.pagination import StandardResultsPagination
 
 
 @api_view(['GET', 'POST'])
@@ -19,7 +19,7 @@ def attendance_list(request, gym_id):
     if request.method == 'GET':
         attendances = GymAttendance.objects.filter(
             gym_id=gym_id,
-            gym__owner=request.user
+            gym__owner=request.user.owner_profile
         ).select_related('member', 'gym')
 
         member_id = request.query_params.get('member_id')
@@ -29,7 +29,7 @@ def attendance_list(request, gym_id):
         date_from = request.query_params.get('date_from')
         if date_from:
             try:
-                date_from_obj = datetime.strptime(date_from, '%Y-%m-%d')
+                date_from_obj = datetime.strptime(date_from, '%Y-%m-%d').date()
                 attendances = attendances.filter(date__gte=date_from_obj)
             except ValueError:
                     return Response(
@@ -44,7 +44,7 @@ def attendance_list(request, gym_id):
         date_to = request.query_params.get('date_to')
         if date_to:
             try:
-                date_to_obj = datetime.strptime(date_to, '%Y-%m-%d')
+                date_to_obj = datetime.strptime(date_to, '%Y-%m-%d').date()
                 date_to_obj = date_to_obj.replace(hour = 23, minute = 59, second = 59)
                 attendances = attendances.filter(date__lte=date_to_obj)
 
@@ -80,10 +80,10 @@ def attendance_list(request, gym_id):
     if request.method == 'POST':
         serializer = GymAttendanceSerializer(data=request.data)
         if serializer.is_valid():
-            gym = get_object_or_404(Gym, id=gym_id, owner=request.user)
+            gym = get_object_or_404(Gym, id=gym_id, owner=request.user.owner_profile)
 
-            member_id = serializer.data.get('member_id')
-            member = get_object_or_404(GymMember, pk=member_id, gym=gym)
+            member = serializer.validated_data.get('member')
+            
             serializer.save(gym=gym, member = member)
 
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -96,7 +96,7 @@ def attendance_detail(request, attendance_id):
     attendance = get_object_or_404(
         GymAttendance,
         pk=attendance_id,
-        gym__owner=request.user
+        gym__owner=request.user.owner_profile
     )
 
     if request.method == 'GET':
@@ -120,18 +120,16 @@ def attendance_detail(request, attendance_id):
 from django.db import transaction, IntegrityError
 
 @api_view(['POST'])
-def attendance_checkin(request):
-    member_id = request.data.get('user_id')
-    gym_id = request.data.get('gym_id')
+def attendance_checkin(request,gym_id):
+    member_id = request.data.get('member_id')
     entry_source = request.data.get('entry_source', 'QR_SCAN')
 
-    if not member_id or not gym_id:
+    if not member_id:
         return Response(
-            {'error': 'user_id and gym_id are required'},
+            {'error': 'member_id is required'},
             status=status.HTTP_400_BAD_REQUEST
         )
-
-    gym = get_object_or_404(Gym, pk=gym_id, owner=request.user)
+    gym = get_object_or_404(Gym, pk=gym_id, owner=request.user.owner_profile)
     member = get_object_or_404(GymMember, pk=member_id, gym=gym)
 
     try:
@@ -153,7 +151,7 @@ def attendance_checkin(request):
 
 @api_view(['GET'])
 def attendance_today(request, gym_id):
-    gym = get_object_or_404(Gym, pk=gym_id, owner=request.user)
+    gym = get_object_or_404(Gym, pk=gym_id, owner=request.user.owner_profile)
     today = timezone.now().date()
 
     attendances = GymAttendance.objects.filter(
@@ -169,7 +167,7 @@ def attendance_today(request, gym_id):
 
 @api_view(['GET'])
 def attendance_stats(request, gym_id):
-    gym = get_object_or_404(Gym, pk=gym_id, owner=request.user)
+    gym = get_object_or_404(Gym, pk=gym_id, owner=request.user.owner_profile)
     days = int(request.query_params.get('days', 7))
     date_from = timezone.now().date() - timedelta(days=days)
 
