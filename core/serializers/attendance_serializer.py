@@ -5,3 +5,4 @@ class GymAttendanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = GymAttendance
         fields = '__all__'
+        read_only_fields = ['gym', 'checkin_time', 'date']

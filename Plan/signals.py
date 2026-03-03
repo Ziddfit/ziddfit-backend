@@ -10,6 +10,6 @@ def create_user_subscription(sender, instance, created, **kwargs):
     if created:
         free_plan, _ = Plan_config.objects.get_or_create(
             tier='free', 
-            defaults={'monthly_price': 0}
+            defaults={'price': 0}
         )
         Plan_Subcription.objects.create(user=instance, plan=free_plan)
