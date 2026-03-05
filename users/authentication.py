@@ -1,116 +1,73 @@
-import jwt
-import base64
-from rest_framework.authentication import BaseAuthentication
-from rest_framework.exceptions import AuthenticationFailed
-from django.conf import settings
+import google.oauth2.id_token
+import google.auth.transport.requests
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.contrib.auth import get_user_model
-from cryptography.hazmat.primitives.asymmetric import ec
-from cryptography.hazmat.backends import default_backend
+from django.conf import settings
+
+from .models import Member, Owner, Trainer
+from utils import get_tokens_for_user, get_user_role
 
 User = get_user_model()
 
-class SupabaseAuthentication(BaseAuthentication):
-    def authenticate(self, request):
-        auth_header = request.headers.get('Authorization')
-        if not auth_header:
-            return None
+class googleauth(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self,request):
+        token = request.data.get('id_token')
+        if not token:
+            return Response(
+                {'error': 'id_token is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
         try:
-            parts = auth_header.split()
-            if len(parts) != 2 or parts[0].lower() != 'bearer':
-                raise AuthenticationFailed('Authorization header must be "Bearer <token>"')         
-            token = parts[1]
-            payload = self.verify_token_locally(token)
-            return self.get_or_create_user(payload)
-
-        except jwt.ExpiredSignatureError:
-            raise AuthenticationFailed("Token expired.")
-        except Exception as e:
-            raise AuthenticationFailed(f"Auth failed: {str(e)}")
-
-
-    def verify_token_locally(self, token):
-        import base64
-        from cryptography.hazmat.primitives.asymmetric import ec
-        from cryptography.hazmat.backends import default_backend
-
-        # These are the EXACT coordinates you just provided
-        x_str = "J46soCb0LMKLVf_QHyWEKR0w5bB82PShdZdHQrIJf6c"
-        y_str = "FcZ3z3f3uHg6vYV_vaQ92-jS4SPo7TxlJyEtLjwS5TU"
-
-        def b64_decode(data):
-            # Supabase/JWT uses base64url encoding. We must add padding if needed.
-            rem = len(data) % 4
-            if rem > 0:
-                data += "=" * (4 - rem)
-            return base64.urlsafe_b64decode(data)
-
-        try:
-            # 1. Decode the coordinates into bytes
-            x_bytes = b64_decode(x_str)
-            y_bytes = b64_decode(y_str)
-
-            # 2. Reconstruct the Public Key from your project's P-256 curve
-            public_key = ec.EllipticCurvePublicNumbers(
-                int.from_bytes(x_bytes, 'big'),
-                int.from_bytes(y_bytes, 'big'),
-                ec.SECP256R1()
-            ).public_key(default_backend())
-
-            # 3. Verify the token signature
-            return jwt.decode(
+            google_user = google.oauth2.id_token.verify_oauth2_token(
                 token,
-                public_key,
-                algorithms=["ES256"],
-                audience="authenticated",
-                options={
-                    "verify_exp": True,
-                    "leeway": 60
-                }
+                google.auth.transport.requests.Request(),
+                settings.GOOGLE_CLIENT_ID
             )
-        except Exception as e:
-            raise Exception(f"Signature check failed: {str(e)}")
-
-
-    def get_or_create_user(self, payload):
-        supabase_uid = payload.get("sub")
-        email = payload.get("email")
-    
-        metadata = payload.get("user_metadata", {})
-        full_name = metadata.get("full_name", "")
-        avatar_url = metadata.get("avatar_url", "")
-    
-        if not supabase_uid:
-            raise AuthenticationFailed("Invalid payload: missing sub")
-    
-        name_parts = full_name.split(" ", 1)
-        f_name = name_parts[0] if len(name_parts) > 0 else ""
-        l_name = name_parts[1] if len(name_parts) > 1 else ""
-    
-        user = User.objects.filter(supabase_uid=supabase_uid).first()
-        if user:
-            return (user, None)
-    
-        user = User.objects.filter(email=email).first()
-        if user:
-            user.supabase_uid = supabase_uid
-            if not user.profile_pic:
-                user.profile_pic = avatar_url
-            user.save()
-            return (user, None)
-    
-        try:
-            user = User.objects.create(
-                supabase_uid=supabase_uid,
-                email=email,
-                first_name=f_name,
-                last_name=l_name,
-                profile_pic=avatar_url,
-                username=email,
-                is_active=True,
+        except ValueError as e:
+            return Response(
+                {'error': 'Invalid Google token', 'detail': str(e)},
+                status=status.HTTP_401_UNAUTHORIZED
             )
+                
+        email = google_user.get('email')
+        first_name = google_user.get('given_name', '')
+        last_name = google_user.get('family_name', '')
+
+        if not email:
+            return Response(
+                {'error': 'Email not provided by Google'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={
+                'username': email,
+                'first_name': first_name,
+                'last_name': last_name,
+            }
+        )
+        if created:
             user.set_unusable_password()
             user.save()
-            return (user, None)
-    
-        except Exception as e:
-            raise AuthenticationFailed(f"Database error during user creation: {str(e)}")
+
+        tokens = get_tokens_for_user(user)
+
+        return Response({
+            'tokens': tokens,
+            'user': {
+                'id': user.id,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'role': get_user_role(user), 
+                'is_new': created,          
+            }
+        }, status=status.HTTP_200_OK)
