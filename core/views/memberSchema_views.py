@@ -8,10 +8,10 @@ from core.serializers.member_serializer import MemberFieldSerializer
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
-def member_schema_list(request, gymid):
+def member_schema_list(request, gym_id):
     if request.method == 'GET':
         try:
-            Fields = GymMemberFieldSchema.objects.filter(gym = gymid)
+            Fields = GymMemberFieldSchema.objects.filter(gym = gym_id)
             serializer = MemberFieldSerializer(Fields, many = True)
             return Response( serializer.data, status = status.HTTP_200_OK)
         
@@ -23,8 +23,9 @@ def member_schema_list(request, gymid):
         try:
             serializer = MemberFieldSerializer(data = request.data)
             if serializer.is_valid():
-                serializer.save(gym = gymid)
+                serializer.save(gym = gym_id)
                 return Response( serializer.data, status = status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
         except Exception as e:
             return Response({
@@ -37,14 +38,29 @@ def member_schema_list(request, gymid):
 
 @api_view(['PUT','PATCH','DELETE'])
 @permission_classes([IsAuthenticated])
-def member_schema_detail(request, gym_id, field_label):
+def member_schema_detail(request, gym_id, field_id):
+    schema_field = get_object_or_404(GymMemberFieldSchema, gym = gym_id, id = field_id)
     try:
-        
-        field_label = request.query_params.get('field_label')
-        field_id = request.query_params.get('field_id')
 
-        if field_label:
-            schema_field = get_object_or_404(GymMemberFieldSchema, gym = gym_id)
+        if request.method == 'PATCH':
+            serializer = MemberFieldSerializer(schema_field, data = request.data, partial = True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status = status.HTTP_200_OK)     
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)                
+
+        if request.method == 'PUT':
+            serializer = MemberFieldSerializer(schema_field, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        if request.method == 'DELETE':
+            schema_field.delete()
+            return Response({"message : The metadata field has been successfully deleted"}, status = status.HTTP_204_NO_CONTENT)
+        
+        
     except Exception as e:
         return Response({
                 'error' : 'creation of field failed',
