@@ -31,4 +31,26 @@ def member_schema_list(request, gymid):
                 'error' : 'creation of field failed',
                 'details' : str(e)
             },
-            status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+            status = status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['PUT','PATCH','DELETE'])
+@permission_classes([IsAuthenticated])
+def member_schema_detail(request, gym_id, field_label):
+    try:
+        
+        field_label = request.query_params.get('field_label')
+        field_id = request.query_params.get('field_id')
+
+        if field_label:
+            schema_field = get_object_or_404(GymMemberFieldSchema, gym = gym_id)
+    except Exception as e:
+        return Response({
+                'error' : 'creation of field failed',
+                'details' : str(e)
+            },
+            status = status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
