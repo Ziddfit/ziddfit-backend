@@ -41,7 +41,7 @@ class GymMember(models.Model):
 
 
 
-class gymMemberFieldSchema(models.Model):
+class GymMemberFieldSchema(models.Model):
     FIELD_TYPES = [
         ("text",        "Text"),
         ("number",      "Number"),
