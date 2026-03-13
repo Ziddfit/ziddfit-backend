@@ -27,3 +27,17 @@ def transaction_list(request, gym_id):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': 'transaction creation failed', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def transaction_detail(request, gym_id, transaction_id):
+    try:
+        transaction = get_object_or_404(Transaction, gym=gym_id, id=transaction_id)
+        serializer = TransactionSerializer(transaction)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        return Response({'error': 'retrieval failed', 'details': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+def transaction_reverse(request, gym_id, transaction_id):
+    pass
