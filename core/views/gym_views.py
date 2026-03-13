@@ -61,3 +61,5 @@ def gym_detail(request, gym_id):
     if request.method == 'DELETE':
         gym.delete()
         return Response({"message": "Gym deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+    
+
