@@ -5,7 +5,7 @@ from ..models.gym import Gym
 from ..models.members import GymMember
 from ..models.gym_staff import GymStaff
 
-class LedgerEntry(models.Model):
+class Transaction(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     name = models.CharField(max_length= 255)
