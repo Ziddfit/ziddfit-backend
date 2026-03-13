@@ -20,7 +20,8 @@ class Transaction(models.Model):
         ("debit",  "Debit"),
     ]
     transaction_type = models.CharField(max_length=10, choices=TRANSACTION_TYPE)
-
+    amount = models.PositiveIntegerField()
+    
     CATEGORIES = []
     category = models.CharField(max_length=20, choices=CATEGORIES)
 
@@ -32,6 +33,16 @@ class Transaction(models.Model):
     # optional — only set if party is in your system
     member = models.ForeignKey(GymMember, null=True, blank=True, on_delete=models.SET_NULL)
     staff  = models.ForeignKey(GymStaff, null=True, blank=True, on_delete=models.SET_NULL)
+
+
+    is_reversal = models.BooleanField(default = False)
+    reversal_of = models.ForeignKey(
+        "self",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL
+    )
+
 
     created_at = models.DateTimeField(auto_now_add= True)
 
