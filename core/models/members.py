@@ -10,25 +10,23 @@ class GymMember(models.Model):
     Links a Global User to a specific Gym and handles subscription/tracking.
     """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='gym_profile',
         help_text="The global identity associated with this gym membership."
     )
-
     gym = models.ForeignKey(
         Gym,
         on_delete=models.CASCADE,
         related_name='members'
     )
-
     membership_start = models.DateField(auto_now_add=True)
     membership_end = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
-
     extra_info = models.JSONField(default=dict, blank=True)
+
+
 
     def sync_active_status(self):                       
         if self.membership_end is None:
@@ -36,7 +34,7 @@ class GymMember(models.Model):
         else:
             self.is_active = self.membership_end >= date.today()
         self.save(update_fields=['is_active'])
-        
+
     def __str__(self):
         return f"{self.user.email} - {self.gym.name}"
 
