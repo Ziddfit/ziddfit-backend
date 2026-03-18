@@ -11,8 +11,22 @@ from core.serializers.transaction_serializer import TransactionSerializer
 @permission_classes([IsAuthenticated])
 def transaction_list(request, gym_id):
     if request.method == 'GET':
+
+        transaction_type = request.query_params.get('transaction_type')
+        date_from = request.query_paras.get('date_from')
+        date_to = request.query_params.get('date_to')
+
         try:
             transactions = Transaction.objects.filter(gym=gym_id)
+
+            #query chaining
+            if transaction_type:
+                transactions = transactions.filter(transaction_type = transaction_type)
+            if date_from:
+                transactions = transactions.filter(created_at__date__gte = date_from)
+            if date_to:
+                transactions = transactions.filter(created_at__date__lte = date_to)
+
             serializer = TransactionSerializer(transactions, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
