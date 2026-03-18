@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from core.models.gym import Gym
 from django.db.models import Q
-from core.models.members import GymMember
+from core.models.members import GymMember, GymMemberFieldSchema
 from core.serializers.member_serializer import GymMemberSerializer
 from datetime import datetime
 from django.utils import timezone
@@ -35,6 +35,15 @@ def member_list(request, gym_id):
                     Q(user__last_name__icontains = search) |
                     Q(phone__icontains = search)
                 )
+
+            schema_keys = GymMemberFieldSchema.objects.filter(
+            gym=gym, is_active=True
+            ).values_list('field_key', flat=True)
+            
+            for key in schema_keys:
+                value = request.query_params.get(key)
+                if value:
+                    members = members.filter(extra_info__contains = {key : value})
 
             paginator = StandardResultsPagination()
             paginated_qs = paginator.paginate_queryset(members, request)
