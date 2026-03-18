@@ -15,6 +15,8 @@ def transaction_list(request, gym_id):
         transaction_type = request.query_params.get('transaction_type')
         date_from = request.query_paras.get('date_from')
         date_to = request.query_params.get('date_to')
+        min_amount       = request.query_params.get('min_amount')
+        max_amount       = request.query_params.get('max_amount')
 
         try:
             transactions = Transaction.objects.filter(gym=gym_id)
@@ -26,6 +28,10 @@ def transaction_list(request, gym_id):
                 transactions = transactions.filter(created_at__date__gte = date_from)
             if date_to:
                 transactions = transactions.filter(created_at__date__lte = date_to)
+            if min_amount:
+                transactions = transactions.filter(amount__gte = min_amount)
+            if max_amount:
+                transactions = transactions.filter(amount__lte = max_amount)
 
             serializer = TransactionSerializer(transactions, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
