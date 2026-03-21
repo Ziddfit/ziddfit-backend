@@ -9,26 +9,22 @@ from .models import Plan_config, Plan_Subcription
 from .serializer import Plan_con_Serializer, Plan_sub_Serializer
 
 
-# ─── GET ALL AVAILABLE PLANS ─────────────────────────────────────────────────
-
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_plan(request):
     try:
-        plans = Plan_config.objects.all().order_by('price')      # ✅ fixed from monthly_price
+        plans = Plan_config.objects.all().order_by('price') 
         serializer = Plan_con_Serializer(plans, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Exception as e:
         return Response(
-            {"error": str(e)},                                   # ✅ fixed f-string bug
+            {"error": str(e)},                                
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
 
-# ─── GET CURRENT USER'S SUBSCRIPTION ─────────────────────────────────────────
-
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])                           # ✅ fixed from AllowAny
+@permission_classes([IsAuthenticated])                     
 def get_sub_status(request):
     try:
         subscription = Plan_Subcription.objects.select_related('plan').get(
@@ -41,9 +37,6 @@ def get_sub_status(request):
             {"error": "No subscription found for this user."},
             status=status.HTTP_404_NOT_FOUND
         )
-
-
-# ─── UPGRADE / CHANGE PLAN ────────────────────────────────────────────────────
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -66,7 +59,6 @@ def upgrade_plan(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    # 3. Get user's current subscription
     try:
         subscription = Plan_Subcription.objects.select_related('plan').get(
             user=request.user
@@ -87,7 +79,6 @@ def upgrade_plan(request):
     # 5. Calculate new expiry
     new_expiry = timezone.now() + timedelta(days=new_plan.duration_days)
 
-    # 6. Update subscription
     subscription.plan        = new_plan
     subscription.is_active   = True
     subscription.start_date  = timezone.now()
