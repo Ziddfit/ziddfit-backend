@@ -3,6 +3,7 @@ from django.db import models
 from datetime import date
 from django.conf import settings
 from ..models.gym import Gym
+from ..models.subscription import GymSubscription
 
 class GymMember(models.Model):
     """
@@ -21,6 +22,9 @@ class GymMember(models.Model):
         on_delete=models.CASCADE,
         related_name='members'
     )
+
+    # in GymMember model
+    subscription = models.ForeignKey(GymSubscription, on_delete=models.SET_NULL, null=True, blank=True)
     membership_start = models.DateField(auto_now_add=True)
     membership_end = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=True)

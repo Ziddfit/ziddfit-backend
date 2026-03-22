@@ -13,28 +13,17 @@ class GymSubscription(models.Model):
         ('YEARLY', 'Yearly'),
         ('CUSTOM', 'Custom'),
     ]
-    id = models.UUIDField(primary_key= True, default = uuid.uuid4, editable= False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    gym = models.ForeignKey(Gym, on_delete=models.CASCADE, related_name='subscription_plans')  # ← add this
     time_period = models.PositiveIntegerField(help_text="Duration of the plan in days")
-    description = models.CharField(max_length = 250)
-    member = models.OneToOneField(
-        GymMember,
-        on_delete=models.SET_NULL,
-        null=True, 
-        blank=True,
-        related_name='subscription'
-    )
-    plan_type = models.CharField(
-        max_length=20,
-        choices=PLAN_TYPE,
-        default='MONTHLY'
-    )
+    description = models.CharField(max_length=250)
+    plan_type = models.CharField(max_length=20, choices=PLAN_TYPE, default='MONTHLY')
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    discount_percent = models.PositiveSmallIntegerField(default=0) 
-    is_active = models.BooleanField(default = True)
-    start_date = models.DateField(auto_now_add=True)
-    end_date = models.DateField(null=True, blank=True)
-    
+    discount_percent = models.PositiveSmallIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+    is_default = models.BooleanField(default=False)  # ← add this
+
     class Meta:
         indexes = [
-            models.Index(fields=['member', 'plan_type']),
+            models.Index(fields=['gym', 'plan_type']),
         ]
