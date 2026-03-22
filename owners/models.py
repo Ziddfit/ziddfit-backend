@@ -6,7 +6,8 @@ class Owner(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='owner_profile'
+        related_name='owner_profile',
+        null = True
     )
     business_name = models.CharField(max_length= 255)
     tax_id = models.CharField(max_length=50, unique=True, null=True)
