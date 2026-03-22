@@ -2,3 +2,6 @@ django==6.0.1
 djangorestframework
 psycopg2-binary
 PyJWT[crypto]
+google-auth
+djangorestframework-simplejwt
+requests

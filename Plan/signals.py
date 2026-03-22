@@ -1,15 +1,18 @@
-from django.db.models.signals import post_save
 from django.dispatch import receiver
-from .models import Plan_config,Plan_Subcription
+from django.db.models.signals import post_save  # ← was missing
+from .models import Plan_config, Plan_Subcription
 from django.contrib.auth import get_user_model
 
 user = get_user_model()
 
-@receiver(post_save,sender = user)
+@receiver(post_save, sender=user)
 def create_user_subscription(sender, instance, created, **kwargs):
     if created:
         free_plan, _ = Plan_config.objects.get_or_create(
-            tier='free', 
-            defaults={'price': 0}
+            tier='free',
+            defaults={
+                'price': 0,
+                'duration_days': 0  # ← add this, 0 = unlimited/no expiry for free plan
+            }
         )
         Plan_Subcription.objects.create(user=instance, plan=free_plan)

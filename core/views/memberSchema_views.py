@@ -4,11 +4,13 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from core.models.members import GymMemberFieldSchema
+from core.models.gym import Gym
 from core.serializers.member_serializer import MemberFieldSerializer
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def member_schema_list(request, gym_id):
+    gym = get_object_or_404(Gym, pk=gym_id)
     if request.method == 'GET':
         try:
             Fields = GymMemberFieldSchema.objects.filter(gym = gym_id)
@@ -23,7 +25,7 @@ def member_schema_list(request, gym_id):
         try:
             serializer = MemberFieldSerializer(data = request.data)
             if serializer.is_valid():
-                serializer.save(gym = gym_id)
+                serializer.save(gym = gym)
                 return Response( serializer.data, status = status.HTTP_201_CREATED)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             

@@ -6,5 +6,5 @@ urlpatterns = [
     path('', gym_list, name='gym-list'),
     path('<uuid:gym_id>', gym_detail, name = 'gym-detail'),
     path('<uuid:gym_id>/member-schema', member_schema_list, name = 'extra_schema_list' ),
-    path('<uuid:gym_id>/member-schema-detail/<uuid:schema_id>', member_schema_detail, name = 'extra_schema_detail')
+    path('<uuid:gym_id>/member-schema-detail/<uuid:field_id>', member_schema_detail, name = 'extra_schema_detail')
 ]

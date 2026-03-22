@@ -88,22 +88,21 @@ DATABASES = {
     }
 }
 
-DATABASE_ROUTERS = ['ziddfit.db_router.AnalyticsRouter']
+#DATABASE_ROUTERS = ['ziddfit.db_router.AnalyticsRouter']
 
 # Supabase Configuration
-SUPABASE_URL = "https://toiwsjvxlmoxuyfprafb.supabase.co"
-SUPABASE_JWT_AUDIENCE = "authenticated"  # Default Supabase audience
-SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvaXdzanZ4bG1veHV5ZnByYWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyODg4MzQsImV4cCI6MjA4NTg2NDgzNH0.7vtQAwcxUQdbmAxTscrEeAO7g_jxPyDCndEp5FUIrp0'
+#SUPABASE_URL = "https://toiwsjvxlmoxuyfprafb.supabase.co"
+#SUPABASE_JWT_AUDIENCE = "authenticated"  # Default Supabase audience
+#SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRvaXdzanZ4bG1veHV5ZnByYWZiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAyODg4MzQsImV4cCI6MjA4NTg2NDgzNH0.7vtQAwcxUQdbmAxTscrEeAO7g_jxPyDCndEp5FUIrp0'
 # DRF Configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'users.authentication.SupabaseAuthentication',  # We will create this file next
+        'users.authentication.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
     ),
 }
-
 CORS_ALLOW_ALL_ORIGINS = True
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
