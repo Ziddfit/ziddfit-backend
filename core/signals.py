@@ -18,16 +18,24 @@ def create_default_plan(sender, instance, created, **kwargs):
             is_active=True,
         )
 
+
+#this fires up when a new gymmember is saved
 @receiver(post_save, sender=GymMember)
 def assign_default_plan(sender, instance, created, **kwargs):
-    if created and not instance.subscription:
-        default_plan = GymSubscription.objects.filter(
-            gym=instance.gym,
-            is_default=True,
-            is_active=True
-        ).first()
+    if created:
+        if instance.subscription:
+            # owner selected a plan — just calculate membership_end from it
+            instance.membership_end = date.today() + timedelta(days=instance.subscription.time_period)
+            instance.save(update_fields=['membership_end'])
+        else:
+            # no plan selected — assign default free plan
+            default_plan = GymSubscription.objects.filter(
+                gym=instance.gym,
+                is_default=True,
+                is_active=True
+            ).first()
 
-        if default_plan:
-            instance.subscription = default_plan
-            instance.membership_end = date.today() + timedelta(days=default_plan.time_period)
-            instance.save(update_fields=['subscription', 'membership_end'])
+            if default_plan:
+                instance.subscription = default_plan
+                instance.membership_end = date.today() + timedelta(days=default_plan.time_period)
+                instance.save(update_fields=['subscription', 'membership_end'])
