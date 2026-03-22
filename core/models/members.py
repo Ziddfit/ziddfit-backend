@@ -23,7 +23,6 @@ class GymMember(models.Model):
         related_name='members'
     )
 
-    # in GymMember model
     subscription = models.ForeignKey(GymSubscription, on_delete=models.SET_NULL, null=True, blank=True)
     membership_start = models.DateField(auto_now_add=True)
     membership_end = models.DateField(null=True, blank=True)
