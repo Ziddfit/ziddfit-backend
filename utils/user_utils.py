@@ -1,7 +1,7 @@
 from rest_framework_simplejwt.tokens import RefreshToken 
 
 
-def get_refresh_token(user):
+def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
     return {
         'refresh' : str(refresh),
