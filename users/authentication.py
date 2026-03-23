@@ -156,7 +156,16 @@ class TokenRefreshView(APIView):
             tokens = get_tokens_for_user(user)
 
             response = Response({
-                'access': tokens['access']
+                'access': tokens['access'],
+                'user': {
+                    'id':          str(user.id),
+                    'email':       user.email,
+                    'first_name':  user.first_name,
+                    'last_name':   user.last_name,
+                    'profile_pic': user.profile_pic,
+                    'role':        get_user_role(user),
+                    'claimed':     user.claimed,
+                }
             })
 
             set_refresh_cookie(response, tokens['refresh'])
