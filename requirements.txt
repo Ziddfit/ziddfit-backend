@@ -5,3 +5,5 @@ PyJWT[crypto]
 google-auth
 djangorestframework-simplejwt
 requests
+httpx 
+cryptography
