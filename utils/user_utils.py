@@ -1,18 +1,17 @@
-from rest_framework_simplejwt.tokens import RefreshToken 
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
     return {
-        'refresh' : str(refresh),
-        'access' : str(refresh.access_token),
+        'refresh': str(refresh),
+        'access':  str(refresh.access_token),
     }
 
+
 def get_user_role(user):
-    if hasattr(user,'gym_profile'):
-        return 'member'
-    elif hasattr(user,'owner'):
+    if hasattr(user, 'owner'):
         return 'owner'
-    elif hasattr(user,'staff_profile'):
+    if hasattr(user, 'staff'):
         return 'staff'
-    return None
+    return 'member'
