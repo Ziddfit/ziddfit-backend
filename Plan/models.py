@@ -4,7 +4,7 @@ import uuid
 
 class Plan_config(models.Model):
     PLAN_CHOICES = [
-        ('free', 'Free Tier'),
+        ('starter', 'Starter'),
         ('pro', 'Professional'),
         ('enterprise', 'Enterprise'),
     ]

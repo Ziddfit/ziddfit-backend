@@ -22,7 +22,12 @@ class Transaction(models.Model):
     amount = models.PositiveIntegerField()   
     CATEGORIES = []
     category = models.CharField(max_length=20, choices=CATEGORIES)
-    PARTY_TYPE = ['gymmember', 'staff', 'vendor', 'other']
+    PARTY_TYPE = [
+        ('gymmember', 'Gym Member'),
+        ('staff', 'Staff'),
+        ('vendor', 'Vendor'),
+        ('other', 'Other'),
+    ]
     party_name = models.CharField(max_length=255)       
     party_type = models.CharField(max_length=20, choices= PARTY_TYPE)         
     member = models.ForeignKey(GymMember, null=True, blank=True, on_delete=models.SET_NULL)
