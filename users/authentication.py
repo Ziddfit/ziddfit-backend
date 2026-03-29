@@ -12,8 +12,8 @@ from rest_framework_simplejwt.exceptions import TokenError
 from django.contrib.auth import get_user_model
 from django.conf import settings
 
-from ..models.owner import Owner
-from ..models.social_auth import SocialAuth
+from owners.models import Owner
+from users.socialauth import SocialAuth
 from ..utils import get_tokens_for_user, get_user_role
 
 User = get_user_model()
