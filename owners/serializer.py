@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from models import Owner
+from .models import Owner
 from users.serializer import UserSerializer
 
 class OwnerSerializer(serializers.ModelSerializer):

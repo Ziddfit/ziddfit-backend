@@ -5,12 +5,26 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .models import Owner
-from .serializers import OwnerSerializer
+from .serializer import OwnerSerializer
 
 
-@api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
+@api_view(['GET', 'POST', 'PUT', 'PATCH', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def owner_profile(request):
+    if request.method == 'POST':
+        # Check if user already has an owner profile
+        if hasattr(request.user, 'owner_profile') and request.user.owner_profile is not None:
+            return Response(
+                {'error': 'Owner profile already exists'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        serializer = OwnerSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     try:
         profile = request.user.owner_profile
     except Owner.DoesNotExist:
