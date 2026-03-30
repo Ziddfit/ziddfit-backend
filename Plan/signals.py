@@ -1,11 +1,10 @@
 from django.dispatch import receiver
 from django.db.models.signals import post_save  # ← was missing
 from .models import Plan_config, Plan_Subcription
-from django.contrib.auth import get_user_model
+from owners.models import Owner
 
-user = get_user_model()
 
-@receiver(post_save, sender=user)
+@receiver(post_save, sender=Owner)
 def create_user_subscription(sender, instance, created, **kwargs):
     if created:
         free_plan, _ = Plan_config.objects.get_or_create(
