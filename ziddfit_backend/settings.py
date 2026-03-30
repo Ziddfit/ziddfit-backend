@@ -10,6 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 from pathlib import Path
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -148,3 +152,5 @@ RAZORPAY_KEY_SECRET = 'GTmMLgx7quPsse5c5stF011r'
 
 # Webhook secret from: https://dashboard.razorpay.com/app/settings/webhooks
 RAZORPAY_WEBHOOK_SECRET = 'whsec_test_REPLACE_WITH_YOUR_WEBHOOK_SECRET'
+
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID')

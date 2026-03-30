@@ -11,9 +11,15 @@ from core.serializers.gym_serializer import GymSerializer
 def gym_list(request):
     if request.method == 'GET':
         try:
+            # Check if user has owner profile
+            if not hasattr(request.user, 'owner_profile') or request.user.owner_profile is None:
+                return Response(
+                    {'error': 'Owner profile required to view gyms. Create one at POST /api/owners/owner/'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
             gyms = Gym.objects.filter(owner = request.user.owner_profile)
             serializer = GymSerializer(gyms, many=True)
-
             return Response( serializer.data, status = status.HTTP_200_OK)
         except Exception as e:
             return Response({ 'error' : 'retrieval failed', 'details' : str(e)}, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -21,8 +27,14 @@ def gym_list(request):
 
     elif request.method == 'POST':
         try:
+            # Check if user has owner profile
+            if not hasattr(request.user, 'owner_profile') or request.user.owner_profile is None:
+                return Response(
+                    {'error': 'Owner profile required to create gyms. Create one at POST /api/owners/owner/'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
             serializer = GymSerializer(data = request.data)
-            print(request.user)
             if serializer.is_valid():
                 serializer.save(owner=request.user.owner_profile)
                 return Response( serializer.data, status = status.HTTP_201_CREATED)
@@ -39,6 +51,13 @@ def gym_list(request):
 @api_view(['PUT', 'PATCH', 'DELETE'])
 @permission_classes([IsAuthenticated])
 def gym_detail(request, gym_id):
+    # Check if user has owner profile
+    if not hasattr(request.user, 'owner_profile') or request.user.owner_profile is None:
+        return Response(
+            {'error': 'Owner profile required to manage gyms. Create one at POST /api/owners/owner/'},
+            status=status.HTTP_403_FORBIDDEN
+        )
+    
     gym = get_object_or_404(Gym, pk=gym_id, owner=request.user.owner_profile)
     if request.method == 'GET':
         serializer = GymSerializer(gym)
