@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'users',
     'Plan',
-    'owners'
+    'owners',
+    'payments',
 ]
 
 MIDDLEWARE = [
@@ -97,7 +98,7 @@ DATABASES = {
 # DRF Configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'users.authentication.JWTAuthentication',
+        'users.jwt_auth.JWTAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.AllowAny',
@@ -139,3 +140,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Razorpay settings (use test keys for development)
+# Get these from: https://dashboard.razorpay.com/app/settings/api-keys (Test Mode)
+RAZORPAY_KEY_ID = 'rzp_test_SXAF8zAh4apap6'
+RAZORPAY_KEY_SECRET = 'GTmMLgx7quPsse5c5stF011r'
+
+# Webhook secret from: https://dashboard.razorpay.com/app/settings/webhooks
+RAZORPAY_WEBHOOK_SECRET = 'whsec_test_REPLACE_WITH_YOUR_WEBHOOK_SECRET'
