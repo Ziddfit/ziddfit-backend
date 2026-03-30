@@ -141,7 +141,10 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
-# Razorpay settings
-RAZORPAY_KEY_ID = 'your_razorpay_key_id'
-RAZORPAY_KEY_SECRET = 'your_razorpay_key_secret'
-RAZORPAY_WEBHOOK_SECRET = 'your_webhook_secret'
+# Razorpay settings (use test keys for development)
+# Get these from: https://dashboard.razorpay.com/app/settings/api-keys (Test Mode)
+RAZORPAY_KEY_ID = 'rzp_test_SXAF8zAh4apap6'
+RAZORPAY_KEY_SECRET = 'GTmMLgx7quPsse5c5stF011r'
+
+# Webhook secret from: https://dashboard.razorpay.com/app/settings/webhooks
+RAZORPAY_WEBHOOK_SECRET = 'whsec_test_REPLACE_WITH_YOUR_WEBHOOK_SECRET'
