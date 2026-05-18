@@ -13,7 +13,7 @@ def transaction_list(request, gym_id):
     if request.method == 'GET':
 
         transaction_type = request.query_params.get('transaction_type')
-        date_from = request.query_paras.get('date_from')
+        date_from = request.query_params.get('date_from')
         date_to = request.query_params.get('date_to')
         min_amount = request.query_params.get('min_amount')
         max_amount = request.query_params.get('max_amount')
