@@ -39,7 +39,7 @@ def subscription_list(request):
                 member = serializer.validated_data.get('member')
 
                 # Permission check
-                if member.gym.owner != request.user:
+                if member.gym.owner != request.user.owner_profile:
                     return Response(
                         {"error": "You do not have permission to assign subscription to this member."},
                         status=status.HTTP_403_FORBIDDEN

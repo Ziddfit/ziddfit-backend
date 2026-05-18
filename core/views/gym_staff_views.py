@@ -32,7 +32,7 @@ def staff_list(request):
                 gym = serializer.validated_data.get('gym')
 
                 # Permission check: owner only
-                if gym.owner != request.user:
+                if gym.owner != request.user.owner_profile:
                     return Response(
                         {"error": "You do not have permission to add staff to this gym."},
                         status=status.HTTP_403_FORBIDDEN
