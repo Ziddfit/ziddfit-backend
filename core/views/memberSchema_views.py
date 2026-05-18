@@ -10,7 +10,7 @@ from core.serializers.member_serializer import MemberFieldSerializer
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
 def member_schema_list(request, gym_id):
-    gym = get_object_or_404(Gym, pk=gym_id)
+    gym = get_object_or_404(Gym, pk=gym_id, owner=request.user.owner_profile)
     if request.method == 'GET':
         try:
             Fields = GymMemberFieldSchema.objects.filter(gym = gym_id)
@@ -41,7 +41,7 @@ def member_schema_list(request, gym_id):
 @api_view(['PUT','PATCH','DELETE'])
 @permission_classes([IsAuthenticated])
 def member_schema_detail(request, gym_id, field_id):
-    schema_field = get_object_or_404(GymMemberFieldSchema, gym = gym_id, id = field_id)
+    schema_field = get_object_or_404(GymMemberFieldSchema, id=field_id, gym__pk=gym_id, gym__owner=request.user.owner_profile)
     try:
 
         if request.method == 'PATCH':
